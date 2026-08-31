@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { pool } from "./db";
+import { getPool } from "./db";
 
 const SESSION_COOKIE = "jobprimed_session";
 const SESSION_DAYS = 7;
@@ -16,28 +16,39 @@ function getSecret(): string {
   return secret;
 }
 
-export type SessionUser = { id: number; email: string; name: string | null };
+export type Plan = "free" | "premium";
+export type SessionUser = { id: number; email: string; name: string | null; plan: Plan };
 
 export async function createUser(email: string, password: string, name?: string) {
   const passwordHash = await bcrypt.hash(password, 10);
-  const result = await pool.query(
+  const result = await getPool().query(
     `INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3)
-     RETURNING id, email, name`,
+     RETURNING id, email, name, plan`,
     [email.toLowerCase().trim(), passwordHash, name ?? null]
   );
   return result.rows[0] as SessionUser;
 }
 
 export async function verifyUser(email: string, password: string): Promise<SessionUser | null> {
-  const result = await pool.query(
-    `SELECT id, email, name, password_hash FROM users WHERE email = $1`,
+  const result = await getPool().query(
+    `SELECT id, email, name, plan, password_hash FROM users WHERE email = $1`,
     [email.toLowerCase().trim()]
   );
   const row = result.rows[0];
   if (!row) return null;
   const valid = await bcrypt.compare(password, row.password_hash);
   if (!valid) return null;
-  return { id: row.id, email: row.email, name: row.name };
+  return { id: row.id, email: row.email, name: row.name, plan: row.plan };
+}
+
+// No real payment processor is connected — this only flips the plan column
+// in the database for the current account. See app/api/account/upgrade.
+export async function setUserPlan(userId: number, plan: Plan): Promise<SessionUser> {
+  const result = await getPool().query(
+    `UPDATE users SET plan = $1 WHERE id = $2 RETURNING id, email, name, plan`,
+    [plan, userId]
+  );
+  return result.rows[0] as SessionUser;
 }
 
 export function signSession(user: SessionUser): string {

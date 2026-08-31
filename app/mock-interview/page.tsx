@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef, useState } from "react";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CheckCircle2, Star } from "lucide-react";
 import { C, F_DISPLAY, F_BODY, F_MONO, chamfer } from "@/lib/theme";
 import { PageHeader, PrimaryButton, SecondaryButton } from "@/components/ui";
 
@@ -70,6 +71,18 @@ export default function MockInterviewPage() {
   return (
     <div>
       <PageHeader eyebrow="Flagship feature" title="An interview that argues back." sub="Pick a job title and interview type — the AI asks real follow-ups, not a static question bank." />
+      <div className="max-w-6xl mx-auto px-6 mb-4">
+        <Link
+          href="/live-interview"
+          className="flex items-center justify-between gap-4 p-4 flex-wrap"
+          style={{ background: C.gold, ...chamfer(14) }}
+        >
+          <span className="flex items-center gap-2" style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.ink, fontSize: 14 }}>
+            <Star size={16} fill={C.ink} /> Want a real 1-on-1? Try the live AI avatar interview — Premium
+          </span>
+          <span style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.ink, fontSize: 13 }}>See it →</span>
+        </Link>
+      </div>
       <div className="max-w-6xl mx-auto px-6 pb-16 grid md:grid-cols-2 gap-10">
         <div>
           <div className="flex gap-2 mb-4">

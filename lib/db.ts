@@ -20,7 +20,15 @@ function createPool() {
   });
 }
 
-export const pool = global.__jobprimedPool ?? createPool();
-if (process.env.NODE_ENV !== "production") {
-  global.__jobprimedPool = pool;
+// Lazy on purpose: this file's top-level code runs whenever Next.js
+// statically analyzes any route that imports it — including during
+// `next build`, before any real request happens. Building the Pool eagerly
+// here would mean a missing DATABASE_URL breaks the BUILD itself, not just
+// requests at runtime. getPool() defers that connection attempt until a
+// request actually needs the database.
+export function getPool(): Pool {
+  if (!global.__jobprimedPool) {
+    global.__jobprimedPool = createPool();
+  }
+  return global.__jobprimedPool;
 }
