@@ -79,3 +79,36 @@ from inside an AI chat session — they need your own accounts.
 
 That's the whole path from this code to a live, real jobprimed.com with
 working signup and login.
+
+## Connecting Flutterwave for real Premium payments
+
+The checkout page can charge a real card through Flutterwave — the code is
+built and wired up, but I have not been able to test it end to end myself
+(no network access to Flutterwave's API from this environment, and no
+account of my own). Test it yourself before relying on it:
+
+1. Create a Flutterwave account at https://flutterwave.com (or your
+   country's flutterwave.com/XX site) and complete their verification.
+2. In the Flutterwave dashboard, go to Settings -> API and copy your
+   **Test** Secret Key (starts with `FLWSECK_TEST-`).
+3. Add these environment variables in Vercel (Settings -> Environment
+   Variables), same place as DATABASE_URL and JWT_SECRET:
+   - `FLW_SECRET_KEY` — your test secret key to start
+   - `FLW_PREMIUM_AMOUNT` — the amount to charge, e.g. `8000`
+   - `FLW_CURRENCY` — e.g. `NGN`
+4. Redeploy. On the live site, go to Pricing -> Get Premium -> Pay with
+   Flutterwave. Use one of Flutterwave's published test card numbers
+   (see their docs) to complete a test payment.
+5. Confirm it actually upgraded the account: check your dashboard shows
+   "You're on Premium", or query the database directly:
+   `SELECT email, plan FROM users;`
+6. Once a test payment works end to end, replace `FLW_SECRET_KEY` with your
+   **Live** secret key in Vercel to start accepting real payments.
+
+How it works: clicking "Pay with Flutterwave" calls
+`/api/payments/flutterwave/initiate`, which asks Flutterwave for a hosted
+checkout link and redirects the browser there. After payment, Flutterwave
+redirects back to `/api/payments/flutterwave/callback`, which
+re-verifies the transaction server-side with your secret key (never trusts
+the redirect alone) before flipping the account's plan to `premium` in
+the database.

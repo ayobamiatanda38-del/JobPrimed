@@ -10,6 +10,8 @@ export type Template = {
   person: { name: string; role: string };
   summary: string;
   highlights: string[];
+  skills: string[];
+  education: string;
   // Premium-only extra row — metrics, tech stack, bar admissions, etc.
   extras?: string[];
 };
@@ -25,6 +27,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Tunde Bakare", role: "Regional Sales Manager" },
     summary: "7+ years driving B2B revenue across FMCG and energy channels.",
     highlights: ["Grew territory revenue 34% YoY", "Managed a 12-person distributor network"],
+    skills: ["Key Account Management", "Salesforce", "Negotiation", "Channel Development"],
+    education: "B.Sc. Business Administration — University of Lagos",
   },
   {
     slug: "ledger-executive",
@@ -36,6 +40,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Tunde Bakare", role: "Regional Sales Manager" },
     summary: "7+ years driving B2B revenue across FMCG and energy channels.",
     highlights: ["Grew territory revenue 34% YoY", "Managed a 12-person distributor network"],
+    skills: ["Key Account Management", "Salesforce", "Negotiation", "P&L Ownership"],
+    education: "B.Sc. Business Administration — University of Lagos",
     extras: ["$2.4M closed FY25", "Top 3 nationally", "Key accounts: 18"],
   },
   {
@@ -48,6 +54,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Chiamaka Eze", role: "Brand Marketing Lead" },
     summary: "Builds campaigns that move category share, not just impressions.",
     highlights: ["Launched 3 national campaigns", "Grew social engagement 2.1x"],
+    skills: ["Campaign Strategy", "Brand Positioning", "Content Marketing", "Analytics"],
+    education: "B.A. Mass Communication — Covenant University",
   },
   {
     slug: "foundry",
@@ -59,6 +67,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "David Okon", role: "Senior Backend Engineer" },
     summary: "Ships reliable distributed systems at scale, on call by choice.",
     highlights: ["Cut API latency 40%", "Led migration to microservices"],
+    skills: ["Go", "Kubernetes", "PostgreSQL", "AWS"],
+    education: "B.Sc. Computer Science — University of Ibadan",
     extras: ["Go", "Kubernetes", "PostgreSQL", "AWS"],
   },
   {
@@ -71,6 +81,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Ifeoma Nwosu", role: "Senior Financial Analyst" },
     summary: "Turns raw numbers into decisions the board actually acts on.",
     highlights: ["Built the FY26 forecasting model", "Reduced close time by 5 days"],
+    skills: ["Financial Modeling", "Excel", "Variance Analysis", "IFRS"],
+    education: "B.Sc. Accounting — University of Nigeria, Nsukka",
   },
   {
     slug: "vital",
@@ -82,6 +94,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Dr. Amaka Chukwu", role: "Clinical Operations Manager" },
     summary: "Runs patient-facing operations without dropping quality of care.",
     highlights: ["Oversaw a 40-bed unit", "Cut patient wait time 22%"],
+    skills: ["Clinical Operations", "Patient Safety", "Staff Scheduling", "Compliance"],
+    education: "MBBS — College of Medicine, University of Lagos",
   },
   {
     slug: "aperture",
@@ -93,6 +107,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Zainab Bello", role: "Senior Product Designer" },
     summary: "Designs interfaces people don't have to think about.",
     highlights: ["Led redesign of core app flow", "Design-system owner, 40+ components"],
+    skills: ["Figma", "Design Systems", "User Research", "Prototyping"],
+    education: "B.A. Visual Communication — Yaba College of Technology",
     extras: ["Portfolio: 6 case studies", "Figma", "Award: Design Week 2025"],
   },
   {
@@ -105,6 +121,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Emeka Umeh", role: "Corporate Counsel" },
     summary: "Keeps contracts airtight and deals moving on schedule.",
     highlights: ["Closed 60+ commercial contracts/yr", "Built the compliance review playbook"],
+    skills: ["Contract Law", "M&A", "Regulatory Compliance", "Negotiation"],
+    education: "LL.B — University of Lagos; B.L — Nigerian Law School",
     extras: ["Bar: Nigeria, 2016", "M&A", "Data Privacy"],
   },
   {
@@ -117,6 +135,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Grace Adeyemi", role: "Curriculum Development Lead" },
     summary: "Designs learning outcomes that actually change scores.",
     highlights: ["Rolled out to 24 schools", "Raised pass rates by 15%"],
+    skills: ["Curriculum Design", "Assessment Design", "Teacher Training", "EdTech"],
+    education: "M.Ed. Curriculum Studies — University of Ibadan",
   },
   {
     slug: "baseline",
@@ -128,6 +148,8 @@ export const TEMPLATES: Template[] = [
     person: { name: "Musa Abdullahi", role: "Operations Manager" },
     summary: "Keeps multi-site operations running under real pressure.",
     highlights: ["Managed 5-location rollout", "Cut vendor costs 18%"],
+    skills: ["Operations Management", "Vendor Negotiation", "Staff Training", "Budgeting"],
+    education: "B.Sc. Hospitality Management — Lagos State University",
   },
 ];
 

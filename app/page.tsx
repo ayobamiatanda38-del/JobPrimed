@@ -74,22 +74,33 @@ function PrimingMeter() {
 
 function CVMockup() {
   return (
-    <div className="relative w-full bg-white border p-6 sm:p-8" style={{ borderColor: C.steelLine, ...chamfer(20) }}>
-      <div className="absolute top-0 right-0 px-3 py-1 text-xs font-bold" style={{ background: C.ink, color: C.paper, fontFamily: F_MONO, transform: "translateY(-50%)" }}>
+    <div className="relative w-full bg-white border overflow-hidden" style={{ borderColor: C.steelLine, ...chamfer(20) }}>
+      <div className="absolute top-3 right-3 px-3 py-1 text-xs font-bold z-10" style={{ background: C.ink, color: C.paper, fontFamily: F_MONO }}>
         ATS 96/100
       </div>
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <div style={{ fontFamily: F_DISPLAY, fontWeight: 700, fontSize: 20, color: C.ink }}>Adaeze Okafor</div>
-          <div style={{ fontFamily: F_BODY, fontSize: 13, color: C.graphite }}>Senior Trade Marketing Manager</div>
+      <div className="px-6 py-5 sm:px-8 sm:py-6" style={{ background: C.ignite }}>
+        <div style={{ fontFamily: F_DISPLAY, fontWeight: 700, fontSize: 20, color: C.paper }}>Adaeze Okafor</div>
+        <div style={{ fontFamily: F_BODY, fontSize: 13, color: "rgba(255,255,255,0.85)" }}>Senior Trade Marketing Manager</div>
+      </div>
+      <div className="p-6 sm:p-8">
+        <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.ignite, fontWeight: 700 }} className="mb-1">SUMMARY</div>
+        <p style={{ fontFamily: F_BODY, fontSize: 12.5, color: C.ink }} className="mb-4">
+          Builds campaigns that move category share, not just impressions.
+        </p>
+        <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.ignite, fontWeight: 700 }} className="mb-1">EXPERIENCE</div>
+        <ul className="mb-4 space-y-1">
+          <li style={{ fontFamily: F_BODY, fontSize: 12, color: C.graphite }}>— Launched 3 national campaigns</li>
+          <li style={{ fontFamily: F_BODY, fontSize: 12, color: C.graphite }}>— Grew social engagement 2.1x</li>
+        </ul>
+        <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.ignite, fontWeight: 700 }} className="mb-1.5">SKILLS</div>
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {["Campaign Strategy", "Brand Positioning", "Analytics"].map((s) => (
+            <span key={s} className="px-2 py-0.5" style={{ background: C.igniteTint, color: C.igniteDark, fontFamily: F_BODY, fontSize: 11 }}>{s}</span>
+          ))}
         </div>
-        <div style={{ width: 44, height: 44, background: C.steel, ...chamfer(8) }} />
-      </div>
-      <div className="space-y-2 mb-6">
-        {[92, 78, 85, 60].map((w, i) => <div key={i} style={{ height: 7, width: `${w}%`, background: C.steel }} />)}
-      </div>
-      <div className="pt-4 border-t" style={{ borderColor: C.steelLine, fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }}>
-        AI-DRAFTED · TAILORED TO: "REGIONAL SALES MANAGER — FMCG"
+        <div className="pt-3 border-t" style={{ borderColor: C.steelLine, fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }}>
+          AI-DRAFTED · TAILORED TO: "REGIONAL SALES MANAGER — FMCG"
+        </div>
       </div>
     </div>
   );
