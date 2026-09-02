@@ -74,31 +74,62 @@ function PrimingMeter() {
 
 function CVMockup() {
   return (
-    <div className="relative w-full bg-white border overflow-hidden" style={{ borderColor: C.steelLine, ...chamfer(20) }}>
+    <div className="relative w-full bg-white border overflow-hidden flex" style={{ borderColor: C.steelLine, ...chamfer(20) }}>
       <div className="absolute top-3 right-3 px-3 py-1 text-xs font-bold z-10" style={{ background: C.ink, color: C.paper, fontFamily: F_MONO }}>
         ATS 96/100
       </div>
-      <div className="px-6 py-5 sm:px-8 sm:py-6" style={{ background: C.ignite }}>
-        <div style={{ fontFamily: F_DISPLAY, fontWeight: 700, fontSize: 20, color: C.paper }}>Adaeze Okafor</div>
-        <div style={{ fontFamily: F_BODY, fontSize: 13, color: "rgba(255,255,255,0.85)" }}>Senior Trade Marketing Manager</div>
+
+      {/* Dark sidebar — mirrors the "nav labels down the side" layout of
+          the polished resume-builder templates this is drawing on. */}
+      <div className="w-[76px] sm:w-[92px] shrink-0 flex flex-col items-center pt-6 gap-8" style={{ background: C.ink }}>
+        <div className="rounded-full flex items-center justify-center" style={{ width: 40, height: 40, background: C.ignite }}>
+          <span style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.paper, fontSize: 15 }}>AO</span>
+        </div>
+        <span style={{ fontFamily: F_MONO, fontSize: 9, color: "#A6ABB4", writingMode: "vertical-rl", letterSpacing: 1 }}>
+          PROFILE
+        </span>
+        <span style={{ fontFamily: F_MONO, fontSize: 9, color: "#A6ABB4", writingMode: "vertical-rl", letterSpacing: 1 }}>
+          EXPERIENCE
+        </span>
+        <span style={{ fontFamily: F_MONO, fontSize: 9, color: "#A6ABB4", writingMode: "vertical-rl", letterSpacing: 1 }}>
+          SKILLS
+        </span>
       </div>
-      <div className="p-6 sm:p-8">
-        <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.ignite, fontWeight: 700 }} className="mb-1">SUMMARY</div>
-        <p style={{ fontFamily: F_BODY, fontSize: 12.5, color: C.ink }} className="mb-4">
-          Builds campaigns that move category share, not just impressions.
+
+      <div className="flex-1 p-5 sm:p-7">
+        <div className="mb-4">
+          <div style={{ fontFamily: F_DISPLAY, fontWeight: 700, fontSize: 20, color: C.ink }}>Adaeze Okafor</div>
+          <div style={{ fontFamily: F_BODY, fontSize: 13, color: C.ignite, fontWeight: 600 }}>Senior Trade Marketing Manager</div>
+          <div style={{ fontFamily: F_BODY, fontSize: 10.5, color: C.graphiteLight }} className="mt-0.5">
+            Lagos, Nigeria · adaeze.okafor@email.com
+          </div>
+        </div>
+
+        <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.ignite, fontWeight: 700 }} className="mb-1">PROFILE</div>
+        <p style={{ fontFamily: F_BODY, fontSize: 11.5, color: C.ink, lineHeight: 1.5 }} className="mb-4">
+          Brand marketing lead with 6+ years building campaigns that move category share, not just
+          impressions — from insight to launch to measured lift across FMCG and retail categories.
         </p>
-        <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.ignite, fontWeight: 700 }} className="mb-1">EXPERIENCE</div>
-        <ul className="mb-4 space-y-1">
-          <li style={{ fontFamily: F_BODY, fontSize: 12, color: C.graphite }}>— Launched 3 national campaigns</li>
-          <li style={{ fontFamily: F_BODY, fontSize: 12, color: C.graphite }}>— Grew social engagement 2.1x</li>
-        </ul>
+
+        <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.ignite, fontWeight: 700 }} className="mb-1">WORK EXPERIENCE</div>
+        <div className="mb-1.5">
+          <div style={{ fontFamily: F_BODY, fontSize: 11.5, color: C.ink, fontWeight: 700 }}>Brand Marketing Lead · Unique Digital</div>
+          <div style={{ fontFamily: F_MONO, fontSize: 9.5, color: C.graphiteLight }} className="mb-1">2022 — Present</div>
+          <ul className="space-y-0.5 mb-2">
+            <li style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphite }}>— Launched 3 national campaigns, one hitting #1 category share</li>
+            <li style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphite }}>— Grew social engagement 2.1x across all owned channels</li>
+            <li style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphite }}>— Managed a ₦120M annual media budget across 4 agencies</li>
+          </ul>
+        </div>
+
         <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.ignite, fontWeight: 700 }} className="mb-1.5">SKILLS</div>
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {["Campaign Strategy", "Brand Positioning", "Analytics"].map((s) => (
-            <span key={s} className="px-2 py-0.5" style={{ background: C.igniteTint, color: C.igniteDark, fontFamily: F_BODY, fontSize: 11 }}>{s}</span>
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {["Campaign Strategy", "Brand Positioning", "Content Marketing", "Analytics"].map((s) => (
+            <span key={s} className="px-2 py-0.5" style={{ background: C.igniteTint, color: C.igniteDark, fontFamily: F_BODY, fontSize: 10.5 }}>{s}</span>
           ))}
         </div>
-        <div className="pt-3 border-t" style={{ borderColor: C.steelLine, fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }}>
+
+        <div className="pt-2 border-t" style={{ borderColor: C.steelLine, fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>
           AI-DRAFTED · TAILORED TO: "REGIONAL SALES MANAGER — FMCG"
         </div>
       </div>
