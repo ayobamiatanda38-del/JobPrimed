@@ -231,41 +231,115 @@ function DownloadPanel({
       const { jsPDF } = await import("jspdf");
       const doc = new jsPDF({ unit: "pt", format: "a4" });
       const pageWidth = doc.internal.pageSize.getWidth();
-      const marginX = 48;
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 50;
+      const contentWidth = pageWidth - marginX * 2;
+      const bottomLimit = pageHeight - 56;
       let y = 0;
 
       const [r, g, b] = hexToRgb(accent);
+      const mix = (factor: number): [number, number, number] => [
+        Math.round(r + (255 - r) * factor),
+        Math.round(g + (255 - g) * factor),
+        Math.round(b + (255 - b) * factor),
+      ];
+      const [lr, lg, lb] = mix(0.85); // light chip fill
+      const [pr, pg, pb] = mix(0.9); // section-pill fill
+      const [dr, dg, db] = mix(0.75); // divider line
+
+      const ensureSpace = (needed: number) => {
+        if (y + needed > bottomLimit) {
+          doc.addPage();
+          y = 56;
+        }
+      };
+
+      // --- Header band ---
+      const headerHeight = 108;
       doc.setFillColor(r, g, b);
-      doc.rect(0, 0, pageWidth, 90, "F");
+      doc.rect(0, 0, pageWidth, headerHeight, "F");
       doc.setTextColor(255, 255, 255);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(20);
-      doc.text(name || "Your Name", marginX, 45);
+      doc.setFontSize(24);
+      doc.text(name || "Your Name", marginX, 54);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
-      doc.text(role || "Your Role", marginX, 66);
-      y = 120;
+      doc.setFontSize(13);
+      doc.text(role || "Your Role", marginX, 76);
+      // thin accent-tinted rule under the header for a designed edge
+      doc.setDrawColor(255, 255, 255);
+      doc.setLineWidth(0.75);
+      doc.line(marginX, 90, pageWidth - marginX, 90);
+
+      y = headerHeight + 32;
 
       order.forEach((id) => {
         const def = getSectionDef(id);
         const value = content[id];
         if (!value) return;
-        doc.setTextColor(r, g, b);
+
+        // --- Section label pill ---
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        doc.text(def.label.toUpperCase(), marginX, y);
-        y += 16;
-        doc.setTextColor(20, 20, 20);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10.5);
-        const wrapped = doc.splitTextToSize(value, pageWidth - marginX * 2);
-        doc.text(wrapped, marginX, y);
-        y += wrapped.length * 13 + 14;
-        if (y > 760) {
-          doc.addPage();
-          y = 48;
+        doc.setFontSize(10);
+        const label = def.label.toUpperCase();
+        const labelWidth = doc.getTextWidth(label) + 20;
+        ensureSpace(28);
+        doc.setFillColor(pr, pg, pb);
+        doc.roundedRect(marginX, y - 12, labelWidth, 18, 4, 4, "F");
+        doc.setTextColor(r, g, b);
+        doc.text(label, marginX + 10, y);
+        y += 22;
+
+        if (id === "skills" || id === "strengths") {
+          // --- Chip row, wrapping across lines ---
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          let x = marginX;
+          const chipHeight = 20;
+          const chipGap = 8;
+          const items = value.split(",").map((s) => s.trim()).filter(Boolean);
+          ensureSpace(chipHeight + 10);
+          items.forEach((item) => {
+            const w = doc.getTextWidth(item) + 18;
+            if (x + w > marginX + contentWidth) {
+              x = marginX;
+              y += chipHeight + chipGap;
+              ensureSpace(chipHeight + 10);
+            }
+            doc.setFillColor(lr, lg, lb);
+            doc.roundedRect(x, y - 14, w, chipHeight, 5, 5, "F");
+            doc.setTextColor(30, 30, 30);
+            doc.text(item, x + 9, y - 1);
+            x += w + chipGap;
+          });
+          y += chipHeight + 10;
+        } else {
+          // --- Paragraph / bullet block, line by line so bullets stay separate ---
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10.5);
+          doc.setTextColor(25, 25, 25);
+          const rawLines = value.split("\n");
+          rawLines.forEach((rawLine) => {
+            const wrapped = doc.splitTextToSize(rawLine, contentWidth);
+            ensureSpace(wrapped.length * 14 + 4);
+            doc.text(wrapped, marginX, y);
+            y += wrapped.length * 14 + 4;
+          });
+          y += 6;
         }
+
+        // --- Divider before next section ---
+        ensureSpace(20);
+        doc.setDrawColor(dr, dg, db);
+        doc.setLineWidth(0.5);
+        doc.line(marginX, y, marginX + contentWidth, y);
+        y += 20;
       });
+
+      // Footer branding on the last page
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(160, 160, 160);
+      doc.text("Made with JobPrimed", marginX, pageHeight - 24);
 
       doc.save(`${(name || "resume").replace(/\s+/g, "_")}_CV.pdf`);
     } finally {
