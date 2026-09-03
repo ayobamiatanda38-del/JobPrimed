@@ -28,6 +28,11 @@ import { SECTION_DEFS, getSectionDef, type SectionId } from "@/lib/cvSections";
 
 type SessionUser = { id: number; email: string; name: string | null; plan: "free" | "premium" };
 
+// The final CV document itself renders in Times New Roman, distinct from
+// the app's own UI typography — this is what a traditional, serious resume
+// is expected to look like, per direct request.
+const CV_SERIF = "'Times New Roman', Times, serif";
+
 const SECTION_ICONS: Record<SectionId, React.ComponentType<{ size?: number; color?: string }>> = {
   summary: FileText,
   experience: Briefcase,
@@ -43,6 +48,16 @@ const SECTION_ICONS: Record<SectionId, React.ComponentType<{ size?: number; colo
 
 function tint(hex: string, alpha: string) {
   return hex.length === 7 ? `${hex}${alpha}` : hex;
+}
+
+// Skills/Strengths are stored as comma-separated input but rendered as a
+// single flowing sentence — no chip backgrounds, matching "prose, not
+// blocks" for the actual document.
+function asProse(id: SectionId, value: string): string {
+  if (id === "skills" || id === "strengths") {
+    return value.split(",").map((s) => s.trim()).filter(Boolean).join(", ") + ".";
+  }
+  return value;
 }
 
 function SectionEditorCard({
@@ -109,10 +124,13 @@ function SectionEditorCard({
   );
 }
 
+type ContactInfo = { email: string; phone: string; address: string; postalCode: string };
+
 function LivePreview({
   accent,
   name,
   role,
+  contact,
   order,
   content,
   watermark,
@@ -120,22 +138,24 @@ function LivePreview({
   accent: string;
   name: string;
   role: string;
+  contact: ContactInfo;
   order: SectionId[];
   content: Record<SectionId, string>;
   watermark: boolean;
 }) {
+  const contactLine = [contact.email, contact.phone, contact.address, contact.postalCode]
+    .filter(Boolean)
+    .join("  ·  ");
+
   return (
-    <div className="relative bg-white border overflow-hidden" style={{ borderColor: C.steelLine, ...chamfer(18) }}>
+    <div className="relative bg-white border overflow-hidden" style={{ borderColor: C.steelLine, ...chamfer(18), fontFamily: CV_SERIF }}>
       {watermark && (
-        <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
-          style={{ overflow: "hidden" }}
-        >
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10" style={{ overflow: "hidden" }}>
           <span
             style={{
               fontFamily: F_DISPLAY,
               fontWeight: 700,
-              fontSize: 52,
+              fontSize: 48,
               color: "rgba(11,13,14,0.08)",
               transform: "rotate(-28deg)",
               whiteSpace: "nowrap",
@@ -145,37 +165,34 @@ function LivePreview({
           </span>
         </div>
       )}
-      <div className="px-5 py-4" style={{ background: accent }}>
-        <div style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.paper, fontSize: 18 }}>{name || "Your Name"}</div>
-        <div style={{ fontFamily: F_BODY, color: "rgba(255,255,255,0.85)", fontSize: 12 }}>{role || "Your Role"}</div>
+      <div className="px-6 py-5" style={{ background: accent }}>
+        <div style={{ fontFamily: CV_SERIF, fontWeight: 700, color: C.paper, fontSize: 22 }}>{name || "Your Name"}</div>
+        <div style={{ fontFamily: CV_SERIF, color: "rgba(255,255,255,0.9)", fontSize: 13.5 }}>{role || "Your Role"}</div>
+        {contactLine && (
+          <div style={{ fontFamily: CV_SERIF, color: "rgba(255,255,255,0.75)", fontSize: 11 }} className="mt-1">
+            {contactLine}
+          </div>
+        )}
       </div>
-      <div className="p-5">
+      <div className="p-6">
         {order.map((id) => {
           const def = getSectionDef(id);
           const value = content[id];
           if (!value) return null;
           return (
-            <div key={id} className="mb-4">
+            <div key={id} className="mb-5">
               <div
-                className="inline-flex items-center gap-1.5 px-2 py-0.5 mb-1.5"
-                style={{ background: tint(accent, "1f"), color: accent, fontFamily: F_MONO, fontSize: 10, fontWeight: 700 }}
+                className="flex items-center gap-1.5 pb-1 mb-2"
+                style={{ borderBottom: `1.5px solid ${tint(accent, "55")}` }}
               >
-                {def.label.toUpperCase()}
-                {def.tier === "Premium" && <Star size={9} fill={accent} />}
+                <span style={{ fontFamily: CV_SERIF, fontWeight: 700, color: accent, fontSize: 13, letterSpacing: 0.5 }}>
+                  {def.label.toUpperCase()}
+                </span>
+                {def.tier === "Premium" && <Star size={10} fill={accent} color={accent} />}
               </div>
-              {id === "skills" || id === "strengths" ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {value.split(",").map((s) => s.trim()).filter(Boolean).map((s) => (
-                    <span key={s} className="px-2 py-0.5" style={{ background: tint(accent, "12"), color: C.ink, fontFamily: F_BODY, fontSize: 11 }}>
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <div style={{ fontFamily: F_BODY, color: C.ink, fontSize: 12.5, lineHeight: 1.5, whiteSpace: "pre-line" }}>
-                  {value}
-                </div>
-              )}
+              <div style={{ fontFamily: CV_SERIF, color: C.ink, fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-line" }}>
+                {asProse(id, value)}
+              </div>
             </div>
           );
         })}
@@ -189,6 +206,7 @@ function DownloadPanel({
   premiumSectionsUsed,
   name,
   role,
+  contact,
   accent,
   order,
   content,
@@ -197,6 +215,7 @@ function DownloadPanel({
   premiumSectionsUsed: string[];
   name: string;
   role: string;
+  contact: ContactInfo;
   accent: string;
   order: SectionId[];
   content: Record<SectionId, string>;
@@ -205,14 +224,17 @@ function DownloadPanel({
 
   const downloadText = () => {
     setBusy("text");
-    const lines: string[] = [`${name || "Your Name"}`, `${role || "Your Role"}`, ""];
+    const contactLine = [contact.email, contact.phone, contact.address, contact.postalCode].filter(Boolean).join("  |  ");
+    const lines: string[] = [name || "Your Name", role || "Your Role"];
+    if (contactLine) lines.push(contactLine);
+    lines.push("");
     order.forEach((id) => {
       const def = getSectionDef(id);
       if (def.tier === "Premium") return; // free export excludes Premium sections
       const value = content[id];
       if (!value) return;
       lines.push(def.label.toUpperCase());
-      lines.push(value);
+      lines.push(asProse(id, value));
       lines.push("");
     });
     const blob = new Blob([lines.join("\n")], { type: "text/plain" });
@@ -243,9 +265,7 @@ function DownloadPanel({
         Math.round(g + (255 - g) * factor),
         Math.round(b + (255 - b) * factor),
       ];
-      const [lr, lg, lb] = mix(0.85); // light chip fill
-      const [pr, pg, pb] = mix(0.9); // section-pill fill
-      const [dr, dg, db] = mix(0.75); // divider line
+      const [dr, dg, db] = mix(0.55); // underline beneath section headings
 
       const ensureSpace = (needed: number) => {
         if (y + needed > bottomLimit) {
@@ -255,88 +275,58 @@ function DownloadPanel({
       };
 
       // --- Header band ---
-      const headerHeight = 108;
+      const contactLine = [contact.email, contact.phone, contact.address, contact.postalCode].filter(Boolean).join("   ·   ");
+      const headerHeight = contactLine ? 118 : 100;
       doc.setFillColor(r, g, b);
       doc.rect(0, 0, pageWidth, headerHeight, "F");
       doc.setTextColor(255, 255, 255);
-      doc.setFont("helvetica", "bold");
+      doc.setFont("times", "bold");
       doc.setFontSize(24);
-      doc.text(name || "Your Name", marginX, 54);
-      doc.setFont("helvetica", "normal");
+      doc.text(name || "Your Name", marginX, 46);
+      doc.setFont("times", "normal");
       doc.setFontSize(13);
-      doc.text(role || "Your Role", marginX, 76);
-      // thin accent-tinted rule under the header for a designed edge
-      doc.setDrawColor(255, 255, 255);
-      doc.setLineWidth(0.75);
-      doc.line(marginX, 90, pageWidth - marginX, 90);
+      doc.text(role || "Your Role", marginX, 68);
+      if (contactLine) {
+        doc.setFontSize(10);
+        doc.text(contactLine, marginX, 86);
+      }
 
-      y = headerHeight + 32;
+      y = headerHeight + 30;
 
       order.forEach((id) => {
         const def = getSectionDef(id);
         const value = content[id];
         if (!value) return;
 
-        // --- Section label pill ---
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
-        const label = def.label.toUpperCase();
-        const labelWidth = doc.getTextWidth(label) + 20;
-        ensureSpace(28);
-        doc.setFillColor(pr, pg, pb);
-        doc.roundedRect(marginX, y - 12, labelWidth, 18, 4, 4, "F");
+        // --- Section heading: plain bold text with a thin underline, no filled block ---
+        ensureSpace(30);
+        doc.setFont("times", "bold");
+        doc.setFontSize(12.5);
         doc.setTextColor(r, g, b);
-        doc.text(label, marginX + 10, y);
+        const label = def.label.toUpperCase();
+        doc.text(label, marginX, y);
+        const labelWidth = doc.getTextWidth(label);
+        doc.setDrawColor(dr, dg, db);
+        doc.setLineWidth(0.75);
+        doc.line(marginX, y + 4, marginX + Math.max(labelWidth, 60), y + 4);
         y += 22;
 
-        if (id === "skills" || id === "strengths") {
-          // --- Chip row, wrapping across lines ---
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(10);
-          let x = marginX;
-          const chipHeight = 20;
-          const chipGap = 8;
-          const items = value.split(",").map((s) => s.trim()).filter(Boolean);
-          ensureSpace(chipHeight + 10);
-          items.forEach((item) => {
-            const w = doc.getTextWidth(item) + 18;
-            if (x + w > marginX + contentWidth) {
-              x = marginX;
-              y += chipHeight + chipGap;
-              ensureSpace(chipHeight + 10);
-            }
-            doc.setFillColor(lr, lg, lb);
-            doc.roundedRect(x, y - 14, w, chipHeight, 5, 5, "F");
-            doc.setTextColor(30, 30, 30);
-            doc.text(item, x + 9, y - 1);
-            x += w + chipGap;
-          });
-          y += chipHeight + 10;
-        } else {
-          // --- Paragraph / bullet block, line by line so bullets stay separate ---
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(10.5);
-          doc.setTextColor(25, 25, 25);
-          const rawLines = value.split("\n");
-          rawLines.forEach((rawLine) => {
-            const wrapped = doc.splitTextToSize(rawLine, contentWidth);
-            ensureSpace(wrapped.length * 14 + 4);
-            doc.text(wrapped, marginX, y);
-            y += wrapped.length * 14 + 4;
-          });
-          y += 6;
-        }
-
-        // --- Divider before next section ---
-        ensureSpace(20);
-        doc.setDrawColor(dr, dg, db);
-        doc.setLineWidth(0.5);
-        doc.line(marginX, y, marginX + contentWidth, y);
-        y += 20;
+        // --- Prose body (skills/strengths flattened to a sentence upstream) ---
+        doc.setFont("times", "normal");
+        doc.setFontSize(11.5);
+        doc.setTextColor(25, 25, 25);
+        const prose = asProse(id, value);
+        const rawLines = prose.split("\n");
+        rawLines.forEach((rawLine) => {
+          const wrapped = doc.splitTextToSize(rawLine, contentWidth);
+          ensureSpace(wrapped.length * 15 + 4);
+          doc.text(wrapped, marginX, y);
+          y += wrapped.length * 15 + 4;
+        });
+        y += 16;
       });
 
-      // Footer branding on the last page
-      doc.setFont("helvetica", "normal");
+      doc.setFont("times", "italic");
       doc.setFontSize(8);
       doc.setTextColor(160, 160, 160);
       doc.text("Made with JobPrimed", marginX, pageHeight - 24);
@@ -360,7 +350,7 @@ function DownloadPanel({
           <p style={{ fontFamily: F_BODY, fontSize: 12, color: isPremiumUser ? "#166534" : "#92400E" }}>
             This CV uses {premiumSectionsUsed.length} Premium {premiumSectionsUsed.length === 1 ? "section" : "sections"}:{" "}
             <strong>{premiumSectionsUsed.join(", ")}</strong>.
-            {!isPremiumUser && " Upgrade to include them in your PDF."}
+            {!isPremiumUser && " A real Flutterwave payment is required to include them in your PDF."}
           </p>
         </div>
       )}
@@ -390,12 +380,12 @@ function DownloadPanel({
             className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold"
             style={{ background: C.gold, color: C.ink, fontFamily: F_DISPLAY, ...chamfer(10) }}
           >
-            <Lock size={14} /> Unlock colorful PDF
+            <Lock size={14} /> Pay to unlock PDF
           </Link>
         )}
       </div>
       <p className="mt-3" style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>
-        Text export includes only Free sections. The PDF is a real generated file — colors and layout follow your chosen template's accent.
+        Text export includes only Free sections. The PDF (Times New Roman, your template's accent color) requires a verified Flutterwave payment.
       </p>
     </div>
   );
@@ -419,6 +409,7 @@ function EditorContent() {
 
   const [name, setName] = useState(template.person.name);
   const [role, setRole] = useState(template.person.role);
+  const [contact, setContact] = useState<ContactInfo>({ email: "", phone: "", address: "", postalCode: "" });
   const [included, setIncluded] = useState<SectionId[]>(
     SECTION_DEFS.filter((s) => s.defaultIncluded).map((s) => s.id)
   );
@@ -459,6 +450,9 @@ function EditorContent() {
   const setSectionContent = (id: SectionId, value: string) => {
     setContent((c) => ({ ...c, [id]: value }));
   };
+  const setContactField = (field: keyof ContactInfo, value: string) => {
+    setContact((c) => ({ ...c, [field]: value }));
+  };
 
   const addSection = (id: SectionId) => setIncluded((cur) => [...cur, id]);
   const removeSection = (id: SectionId) => setIncluded((cur) => cur.filter((s) => s !== id));
@@ -468,7 +462,7 @@ function EditorContent() {
   if (templateLocked) {
     return (
       <div>
-        <PageHeader eyebrow="Editor" title={`"${template.name}" is a Premium template.`} sub="Upgrade to unlock this template and every other Premium design." />
+        <PageHeader eyebrow="Editor" title={`"${template.name}" is a Premium template.`} sub="A verified Flutterwave payment unlocks this template and every other Premium design." />
         <div className="max-w-lg mx-auto px-6 pb-24">
           <div className="p-8 text-center bg-white border" style={{ borderColor: C.gold, borderWidth: 1.5, ...chamfer(20) }}>
             <div className="w-14 h-14 mx-auto mb-4 flex items-center justify-center" style={{ background: C.gold, ...chamfer(12) }}>
@@ -479,7 +473,7 @@ function EditorContent() {
             </h3>
             <p className="mb-6" style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 13 }}>{template.summary}</p>
             <PrimaryButton href="/checkout?plan=Premium" className="w-full justify-center" style={{ background: C.gold, color: C.ink }}>
-              Unlock with Premium
+              Pay to unlock
             </PrimaryButton>
             <Link href="/templates" className="block mt-4 text-sm" style={{ color: C.graphite }}>Back to templates</Link>
           </div>
@@ -500,15 +494,16 @@ function EditorContent() {
         <div className="max-w-6xl mx-auto px-6 mb-2">
           <div className="p-3 flex items-center gap-2 flex-wrap justify-between" style={{ background: "#FFFBEB", ...chamfer(10) }}>
             <span style={{ fontFamily: F_BODY, fontSize: 13, color: "#92400E" }}>
-              This resume uses {premiumSectionsUsed.length} Premium {premiumSectionsUsed.length === 1 ? "feature" : "features"}: <strong>{premiumSectionsUsed.join(", ")}</strong>
+              This resume uses {premiumSectionsUsed.length} Premium {premiumSectionsUsed.length === 1 ? "feature" : "features"}: <strong>{premiumSectionsUsed.join(", ")}</strong>. You can keep previewing them — payment is only needed to download.
             </span>
-            <Link href="/checkout?plan=Premium" style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.igniteDark, fontSize: 13 }}>Upgrade →</Link>
+            <Link href="/checkout?plan=Premium" style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.igniteDark, fontSize: 13 }}>Pay with Flutterwave →</Link>
           </div>
         </div>
       )}
 
       <div className="max-w-6xl mx-auto px-6 pb-8 pt-4">
         <div className="p-4 bg-white border" style={{ borderColor: C.steelLine, ...chamfer(14) }}>
+          <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }} className="mb-2">CONTACT INFO</div>
           <div className="grid sm:grid-cols-2 gap-3 mb-2">
             <div>
               <label style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>NAME</label>
@@ -517,6 +512,22 @@ function EditorContent() {
             <div>
               <label style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>ROLE / TITLE</label>
               <input value={role} onChange={(e) => setRole(e.target.value)} className="w-full mt-1 px-3 py-2 border text-sm" style={{ borderColor: C.steelLine, fontFamily: F_BODY, ...chamfer(6) }} />
+            </div>
+            <div>
+              <label style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>EMAIL</label>
+              <input value={contact.email} onChange={(e) => setContactField("email", e.target.value)} placeholder="you@email.com" className="w-full mt-1 px-3 py-2 border text-sm" style={{ borderColor: C.steelLine, fontFamily: F_BODY, ...chamfer(6) }} />
+            </div>
+            <div>
+              <label style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>PHONE</label>
+              <input value={contact.phone} onChange={(e) => setContactField("phone", e.target.value)} placeholder="+234 800 000 0000" className="w-full mt-1 px-3 py-2 border text-sm" style={{ borderColor: C.steelLine, fontFamily: F_BODY, ...chamfer(6) }} />
+            </div>
+            <div>
+              <label style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>ADDRESS</label>
+              <input value={contact.address} onChange={(e) => setContactField("address", e.target.value)} placeholder="Street, City, State" className="w-full mt-1 px-3 py-2 border text-sm" style={{ borderColor: C.steelLine, fontFamily: F_BODY, ...chamfer(6) }} />
+            </div>
+            <div>
+              <label style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>POSTAL CODE</label>
+              <input value={contact.postalCode} onChange={(e) => setContactField("postalCode", e.target.value)} placeholder="100001" className="w-full mt-1 px-3 py-2 border text-sm" style={{ borderColor: C.steelLine, fontFamily: F_BODY, ...chamfer(6) }} />
             </div>
           </div>
         </div>
@@ -589,6 +600,7 @@ function EditorContent() {
             accent={template.accent}
             name={name}
             role={role}
+            contact={contact}
             order={included}
             content={content}
             watermark={premiumSectionsUsed.length > 0 && !isPremiumUser}
@@ -602,6 +614,7 @@ function EditorContent() {
           premiumSectionsUsed={premiumSectionsUsed}
           name={name}
           role={role}
+          contact={contact}
           accent={template.accent}
           order={included}
           content={content}
