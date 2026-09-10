@@ -25,6 +25,7 @@ import { C, F_DISPLAY, F_BODY, F_MONO, chamfer } from "@/lib/theme";
 import { PageHeader, PrimaryButton } from "@/components/ui";
 import { findTemplate } from "@/lib/templates";
 import { SECTION_DEFS, getSectionDef, type SectionId } from "@/lib/cvSections";
+import { CVTemplate, type CVData } from "@/components/templates/ledger-serif";
 
 type SessionUser = { id: number; email: string; name: string | null; plan: "free" | "premium" };
 
@@ -210,6 +211,7 @@ function DownloadPanel({
   accent,
   order,
   content,
+  useNativePrint = false,
 }: {
   isPremiumUser: boolean;
   premiumSectionsUsed: string[];
@@ -219,6 +221,9 @@ function DownloadPanel({
   accent: string;
   order: SectionId[];
   content: Record<SectionId, string>;
+  /** Ledger Serif has its own real print stylesheet — use window.print()
+   *  instead of the generic jsPDF layout, which can't reproduce it. */
+  useNativePrint?: boolean;
 }) {
   const [busy, setBusy] = useState<"text" | "pdf" | null>(null);
 
@@ -367,12 +372,12 @@ function DownloadPanel({
 
         {isPremiumUser ? (
           <button
-            onClick={downloadPdf}
+            onClick={useNativePrint ? () => window.print() : downloadPdf}
             disabled={busy === "pdf"}
             className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold"
             style={{ background: C.ink, color: C.paper, fontFamily: F_DISPLAY, ...chamfer(10) }}
           >
-            <Download size={16} /> {busy === "pdf" ? "Generating…" : "Download as PDF"}
+            <Download size={16} /> {busy === "pdf" ? "Generating…" : useNativePrint ? "Print / Save as PDF" : "Download as PDF"}
           </button>
         ) : (
           <Link
@@ -385,7 +390,10 @@ function DownloadPanel({
         )}
       </div>
       <p className="mt-3" style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }}>
-        Text export includes only Free sections. The PDF (Times New Roman, your template's accent color) requires a verified Flutterwave payment.
+        Text export includes only Free sections.{" "}
+        {useNativePrint
+          ? "Print / Save as PDF opens your browser's print dialog — choose \"Save as PDF\" as the destination. Requires a verified Flutterwave payment."
+          : "The PDF (Times New Roman, your template's accent color) requires a verified Flutterwave payment."}
       </p>
     </div>
   );
@@ -399,6 +407,60 @@ function hexToRgb(hex: string): [number, number, number] {
     parseInt(clean.slice(2, 4), 16),
     parseInt(clean.slice(4, 6), 16),
   ];
+}
+
+/**
+ * Best-effort parser: the generic editor stores each section as one
+ * freeform textarea, but CVTemplate expects structured entries (one
+ * object per job/degree/cert). This is a genuine seam between the two
+ * systems — there's no reliable way to parse arbitrary typed text back
+ * into perfect structure, so this makes a reasonable attempt (splitting
+ * on blank lines for multiple jobs, "Role, Company (dates)" on the first
+ * line, "— " bullets below it) and degrades gracefully — worst case, a
+ * whole block just becomes one entry with everything as a single bullet.
+ */
+function parseExperienceBlock(text: string): CVData["experience"] {
+  if (!text.trim()) return [];
+  const blocks = text.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+  return blocks.map((block) => {
+    const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
+    const [headerLine, ...rest] = lines;
+    const dateMatch = headerLine.match(/\(([^)]+)\)\s*$/);
+    let startDate = "";
+    let endDate = "";
+    if (dateMatch) {
+      const [s, e] = dateMatch[1].split(/[–—-]/).map((d) => d.trim());
+      startDate = s || "";
+      endDate = e || "";
+    }
+    const withoutDates = headerLine.replace(/\([^)]+\)\s*$/, "").trim();
+    const [rolePart, ...companyParts] = withoutDates.split(",");
+    const role = (rolePart || withoutDates).trim();
+    const company = companyParts.join(",").trim();
+    const bullets = rest.map((l) => l.replace(/^[—-]\s*/, ""));
+    return { role, company, startDate, endDate, bullets: bullets.length ? bullets : [] };
+  });
+}
+
+function parseEducationBlock(text: string): CVData["education"] {
+  if (!text.trim()) return [];
+  return text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [credential, institution] = line.split(/\s+—\s+/);
+      return { credential: credential || line, institution: institution || "", year: "" };
+    });
+}
+
+function parseCertificationsBlock(text: string): CVData["certifications"] {
+  if (!text.trim()) return [];
+  return text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((name) => ({ name }));
 }
 
 function EditorContent() {
@@ -447,6 +509,30 @@ function EditorContent() {
     [included, content]
   );
 
+  const isLedgerSerif = template.slug === "ledger-serif";
+
+  const cvData: CVData = useMemo(
+    () => ({
+      name,
+      title: role,
+      contact: {
+        email: contact.email || undefined,
+        phone: contact.phone || undefined,
+        address: contact.address || undefined,
+        postalCode: contact.postalCode || undefined,
+      },
+      summary: content.summary || undefined,
+      skills: content.skills ? content.skills.split(",").map((s) => s.trim()).filter(Boolean) : [],
+      education: parseEducationBlock(content.education || ""),
+      certifications: parseCertificationsBlock(
+        [content.certificates, content.awards].filter(Boolean).join("\n")
+      ),
+      experience: parseExperienceBlock(content.experience || ""),
+      footerNote: content.references || undefined,
+    }),
+    [name, role, contact, content]
+  );
+
   const setSectionContent = (id: SectionId, value: string) => {
     setContent((c) => ({ ...c, [id]: value }));
   };
@@ -484,14 +570,16 @@ function EditorContent() {
 
   return (
     <div>
-      <PageHeader
-        eyebrow="Editor preview"
-        title={`Editing with "${template.name}"`}
-        sub="Add or remove sections, type your own content, or use a suggestion — the preview updates live. Skills, Strengths, Achievements, Awards, and Certificates are Premium sections."
-      />
+      <div className="print:hidden">
+        <PageHeader
+          eyebrow="Editor preview"
+          title={`Editing with "${template.name}"`}
+          sub="Add or remove sections, type your own content, or use a suggestion — the preview updates live. Skills, Strengths, Achievements, Awards, and Certificates are Premium sections."
+        />
+      </div>
 
       {premiumSectionsUsed.length > 0 && !isPremiumUser && (
-        <div className="max-w-6xl mx-auto px-6 mb-2">
+        <div className="max-w-6xl mx-auto px-6 mb-2 print:hidden">
           <div className="p-3 flex items-center gap-2 flex-wrap justify-between" style={{ background: "#FFFBEB", ...chamfer(10) }}>
             <span style={{ fontFamily: F_BODY, fontSize: 13, color: "#92400E" }}>
               This resume uses {premiumSectionsUsed.length} Premium {premiumSectionsUsed.length === 1 ? "feature" : "features"}: <strong>{premiumSectionsUsed.join(", ")}</strong>. You can keep previewing them — payment is only needed to download.
@@ -501,7 +589,7 @@ function EditorContent() {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-6 pb-8 pt-4">
+      <div className="max-w-6xl mx-auto px-6 pb-8 pt-4 print:hidden">
         <div className="p-4 bg-white border" style={{ borderColor: C.steelLine, ...chamfer(14) }}>
           <div style={{ fontFamily: F_MONO, fontSize: 10, color: C.graphiteLight }} className="mb-2">CONTACT INFO</div>
           <div className="grid sm:grid-cols-2 gap-3 mb-2">
@@ -533,7 +621,7 @@ function EditorContent() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pb-6">
+      <div className="max-w-6xl mx-auto px-6 pb-6 print:hidden">
         <div style={{ fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }} className="mb-2">
           SECTIONS — ADD OR REMOVE WHAT YOU NEED
         </div>
@@ -573,7 +661,7 @@ function EditorContent() {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 pb-8 grid md:grid-cols-2 gap-8 items-start">
-        <div className="space-y-4">
+        <div className="space-y-4 print:hidden">
           {included.map((id) => (
             <SectionEditorCard
               key={id}
@@ -592,23 +680,45 @@ function EditorContent() {
         </div>
 
         <div className="sticky top-20">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-3 print:hidden">
             <span style={{ fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }}>LIVE PREVIEW</span>
             {template.tier === "Premium" && <Star size={12} color={C.gold} fill={C.gold} />}
           </div>
-          <LivePreview
-            accent={template.accent}
-            name={name}
-            role={role}
-            contact={contact}
-            order={included}
-            content={content}
-            watermark={premiumSectionsUsed.length > 0 && !isPremiumUser}
-          />
+          {isLedgerSerif ? (
+            <div className="relative">
+              {premiumSectionsUsed.length > 0 && !isPremiumUser && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 overflow-hidden">
+                  <span
+                    style={{
+                      fontFamily: F_DISPLAY,
+                      fontWeight: 700,
+                      fontSize: 42,
+                      color: "rgba(11,13,14,0.08)",
+                      transform: "rotate(-28deg)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    PREVIEW — UPGRADE TO DOWNLOAD
+                  </span>
+                </div>
+              )}
+              <CVTemplate data={cvData} />
+            </div>
+          ) : (
+            <LivePreview
+              accent={template.accent}
+              name={name}
+              role={role}
+              contact={contact}
+              order={included}
+              content={content}
+              watermark={premiumSectionsUsed.length > 0 && !isPremiumUser}
+            />
+          )}
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pb-24">
+      <div className="max-w-6xl mx-auto px-6 pb-24 print:hidden">
         <DownloadPanel
           isPremiumUser={isPremiumUser}
           premiumSectionsUsed={premiumSectionsUsed}
@@ -618,10 +728,11 @@ function EditorContent() {
           accent={template.accent}
           order={included}
           content={content}
+          useNativePrint={isLedgerSerif}
         />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 pb-24 flex gap-4">
+      <div className="max-w-6xl mx-auto px-6 pb-24 flex gap-4 print:hidden">
         <Link href="/templates" className="inline-flex items-center gap-2 px-6 py-3.5 font-semibold border" style={{ borderColor: C.ink, color: C.ink, fontFamily: F_DISPLAY, ...chamfer(12) }}>
           Back to templates
         </Link>

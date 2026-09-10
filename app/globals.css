@@ -24,3 +24,18 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/*
+  Global print rule: the app's own Nav and Footer render as real
+  <header>/<footer> elements directly under <body> on every page. Scoping
+  to "body > header" / "body > footer" (rather than a bare header/footer
+  selector) matters — printable content nested inside the page, like the
+  CVTemplate component's own masthead/footer, uses those same semantic
+  tags and must NOT be caught by this rule.
+*/
+@media print {
+  body > header,
+  body > footer {
+    display: none !important;
+  }
+}

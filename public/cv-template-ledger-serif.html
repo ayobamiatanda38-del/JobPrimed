@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ngozi Chukwu — CV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #F7F6F2;
+    --ink: #14181F;
+    --graphite: #4B525A;
+    --field: #2F4F3E;
+    --brass: #9C7A3C;
+    --hairline: #D9D5CB;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #E9E7E1;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sheet {
+    max-width: 800px;
+    margin: 40px auto;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 56px 60px 48px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    padding-bottom: 20px;
+    border-bottom: 1.5px solid var(--brass);
+    margin-bottom: 32px;
+  }
+
+  .masthead h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 40px;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+
+  .masthead .role-line {
+    font-size: 15px;
+    color: var(--graphite);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .masthead .role-line span:not(.dot) {
+    margin-right: 10px;
+  }
+
+  .masthead .role-line .dot {
+    width: 4px;
+    height: 4px;
+    background: var(--field);
+    display: inline-block;
+    border-radius: 0;
+    margin-right: 10px;
+  }
+
+  /* ---------- Grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 0 40px;
+  }
+
+  .spine {
+    border-right: 1px solid var(--hairline);
+    padding-right: 28px;
+  }
+
+  .section {
+    /* Shared by both the spine and the main column — one divider
+       treatment, used the same way everywhere, per the brief. */
+  }
+
+  .section + .section {
+    border-top: 1px solid var(--hairline);
+    margin-top: 24px;
+    padding-top: 24px;
+  }
+
+  .label {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: var(--field);
+    margin: 0 0 10px;
+  }
+
+  .spine-block ul {
+    margin: 0;
+    font-size: 13px;
+    color: var(--graphite);
+    line-height: 1.6;
+  }
+
+  .spine-block ul { list-style: none; padding: 0; }
+  .spine-block li { margin-bottom: 5px; }
+
+  .spine-block .item-title {
+    color: var(--ink);
+    font-weight: 500;
+    display: block;
+  }
+
+  .spine-block .item-sub {
+    display: block;
+    font-size: 12px;
+  }
+
+  /* ---------- Main column ---------- */
+  .main-col .label { font-size: 16px; margin-bottom: 12px; }
+
+  .summary {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .summary em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--field);
+  }
+
+  .exp-entry + .exp-entry {
+    border-top: 1px solid var(--hairline);
+    margin-top: 24px;
+    padding-top: 24px;
+  }
+
+  .exp-header {
+    margin-bottom: 8px;
+  }
+
+  .exp-header .role {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .exp-header .company {
+    font-weight: 400;
+    color: var(--graphite);
+  }
+
+  .exp-header .dates {
+    display: block;
+    font-size: 12px;
+    color: var(--graphite);
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .exp-entry ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .exp-entry li {
+    position: relative;
+    padding-left: 16px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .exp-entry li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    background: var(--field);
+  }
+
+  footer.doc-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--hairline);
+    font-size: 11.5px;
+    color: var(--graphite);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 680px) {
+    .sheet { margin: 0; border: none; padding: 32px 24px; }
+    .masthead h1 { font-size: 30px; }
+    .grid { grid-template-columns: 1fr; }
+    .spine { border-right: none; border-bottom: 1px solid var(--hairline); padding-right: 0; padding-bottom: 24px; margin-bottom: 28px; }
+  }
+
+  /* ---------- Print ---------- */
+  @media print {
+    body { background: white; }
+    .sheet {
+      margin: 0;
+      border: none;
+      max-width: none;
+      padding: 0;
+    }
+    @page { margin: 14mm; }
+    * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <div class="masthead">
+    <h1>Ngozi Chukwu</h1>
+    <div class="role-line">
+      <span>Senior Finance Manager</span>
+      <span class="dot"></span>
+      <span>Lagos, Nigeria</span>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <div class="spine">
+
+      <div class="spine-block section">
+        <p class="label">Contact</p>
+        <ul>
+          <li>ngozi.chukwu@email.com</li>
+          <li>+234 802 345 6789</li>
+          <li>linkedin.com/in/ngozichukwu</li>
+        </ul>
+      </div>
+
+      <div class="spine-block section">
+        <p class="label">Skills</p>
+        <ul>
+          <li>Financial Modeling</li>
+          <li>IFRS Reporting</li>
+          <li>Variance Analysis</li>
+          <li>Power BI &amp; SAP</li>
+          <li>Board Reporting</li>
+          <li>Working Capital Mgmt</li>
+        </ul>
+      </div>
+
+      <div class="spine-block section">
+        <p class="label">Education</p>
+        <ul>
+          <li>
+            <span class="item-title">B.Sc. Accounting</span>
+            <span class="item-sub">University of Lagos, 2014</span>
+          </li>
+          <li style="margin-top:10px;">
+            <span class="item-title">ICAN</span>
+            <span class="item-sub">Chartered 2017</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="spine-block section">
+        <p class="label">Certifications</p>
+        <ul>
+          <li>ACCA Diploma in IFRS, 2020</li>
+          <li>Advanced Financial Modeling — CFI, 2021</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="main-col">
+
+      <div class="section">
+        <p class="label">Summary</p>
+        <p class="summary">
+          Finance leader with nine years turning fragmented reporting into decisions the board can act on the same day.
+          Rebuilt the FY25 forecasting model, cutting variance from 14% to 4%, and has closed
+          <em>three consecutive audit cycles with zero material findings.</em>
+        </p>
+      </div>
+
+      <div class="section">
+        <p class="label">Experience</p>
+
+        <div class="exp-entry">
+          <div class="exp-header">
+            <span><span class="role">Senior Finance Manager</span> · <span class="company">Meridian Consumer Goods Plc</span></span>
+            <span class="dates">Mar 2022 — Present</span>
+          </div>
+          <ul>
+            <li>Rebuilt the FY25 rolling forecast model, cutting forecast variance from 14% to 4% within two quarters.</li>
+            <li>Led a month-end close redesign that reduced close time from 12 to 6 working days.</li>
+            <li>Managed a ₦3.2B annual opex budget across 6 business units.</li>
+            <li>Presented monthly financials directly to the Group CFO and board audit committee.</li>
+          </ul>
+        </div>
+
+        <div class="exp-entry">
+          <div class="exp-header">
+            <span><span class="role">Finance Manager</span> · <span class="company">Alden &amp; Pratt Foods</span></span>
+            <span class="dates">Jul 2018 — Feb 2022</span>
+          </div>
+          <ul>
+            <li>Built the company's first working-capital dashboard, freeing up ₦180M in trapped cash.</li>
+            <li>Supervised a team of 4 analysts through 3 consecutive clean external audits.</li>
+            <li>Introduced variance-to-budget reviews that cut discretionary spend overruns by 22%.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="doc-footer">
+    <span>References available on request.</span>
+    <span>Updated September 2026</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

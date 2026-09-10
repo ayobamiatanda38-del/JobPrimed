@@ -1,0 +1,264 @@
+/*
+  Design tokens are scoped to .wrapper (not :root) on purpose — this
+  component lives inside a larger app with its own color system, and
+  these custom properties must never leak out or collide with it.
+*/
+.wrapper {
+  --paper: #f7f6f2;
+  --ink: #14181f;
+  --graphite: #4b525a;
+  --field: #2f4f3e;
+  --brass: #9c7a3c;
+  --hairline: #d9d5cb;
+
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 56px 60px 48px;
+  border: 1px solid var(--hairline);
+}
+
+.wrapper * {
+  box-sizing: border-box;
+}
+
+/* ---------- Masthead ---------- */
+.masthead {
+  padding-bottom: 20px;
+  border-bottom: 1.5px solid var(--brass);
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.masthead h1 {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 40px;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.photo {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid var(--hairline);
+  flex-shrink: 0;
+}
+
+.roleLine {
+  font-size: 15px;
+  color: var(--graphite);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.roleLine span:not(.dot) {
+  margin-right: 10px;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  background: var(--field);
+  display: inline-block;
+  margin-right: 10px;
+}
+
+/* ---------- Grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 0 40px;
+}
+
+.spine {
+  border-right: 1px solid var(--hairline);
+  padding-right: 28px;
+}
+
+/*
+  One divider rule, reused everywhere a section can follow another —
+  the sibling selector means sections that don't render (empty data)
+  never leave behind an orphaned rule or extra gap.
+*/
+.section + .section {
+  border-top: 1px solid var(--hairline);
+  margin-top: 24px;
+  padding-top: 24px;
+}
+
+.label {
+  font-family: "Fraunces", serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--field);
+  margin: 0 0 10px;
+}
+
+.mainCol .label {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--graphite);
+  line-height: 1.6;
+}
+
+.list li {
+  margin-bottom: 5px;
+}
+
+.itemTitle {
+  color: var(--ink);
+  font-weight: 500;
+  display: block;
+}
+
+.itemSub {
+  display: block;
+  font-size: 12px;
+}
+
+/* ---------- Summary ---------- */
+.summary {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0;
+}
+
+.summary em {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  color: var(--field);
+}
+
+/* ---------- Experience ---------- */
+.expEntry + .expEntry {
+  border-top: 1px solid var(--hairline);
+  margin-top: 24px;
+  padding-top: 24px;
+}
+
+.expHeader {
+  margin-bottom: 8px;
+}
+
+.expHeading {
+  display: inline;
+  font: inherit;
+  margin: 0;
+}
+
+.expRole {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.expCompany {
+  font-weight: 400;
+  color: var(--graphite);
+}
+
+.expDates {
+  display: block;
+  font-size: 12px;
+  color: var(--graphite);
+  font-style: italic;
+  font-family: "Fraunces", serif;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bulletList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bulletList li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.bulletList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  background: var(--field);
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+  font-size: 11.5px;
+  color: var(--graphite);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 680px) {
+  .wrapper {
+    margin: 0;
+    border: none;
+    padding: 32px 24px;
+  }
+  .masthead h1 {
+    font-size: 30px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .spine {
+    border-right: none;
+    border-bottom: 1px solid var(--hairline);
+    padding-right: 0;
+    padding-bottom: 24px;
+    margin-bottom: 28px;
+  }
+}
+
+/* ---------- Print ---------- */
+@media print {
+  .wrapper {
+    margin: 0;
+    border: none;
+    max-width: none;
+    padding: 0;
+    background: white;
+  }
+  @page {
+    margin: 14mm;
+  }
+  .wrapper * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

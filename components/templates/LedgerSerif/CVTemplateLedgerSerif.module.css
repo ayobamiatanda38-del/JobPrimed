@@ -1,0 +1,284 @@
+/*
+ * Styling for <CVTemplateLedgerSerif />.
+ *
+ * Why CSS Modules and not Tailwind/inline styles, for this component
+ * specifically: this document needs a real @media print query and an
+ * @page rule (for margins on the printed/exported page), and React
+ * inline styles cannot express @media queries at all — that's a hard
+ * platform limitation, not a style preference. Tailwind can't cleanly
+ * express @page either without extra plugin config. CSS Modules are a
+ * zero-dependency, built-in Next.js feature, so this stays consistent
+ * with "no new dependencies" even though it's a different mechanism
+ * from the rest of the app's Tailwind + inline-style-object pattern.
+ *
+ * Two accent colors are exposed as CSS custom properties (--accent,
+ * --accent-secondary) so <CVTemplateLedgerSerif theme={...} /> can
+ * override them per-instance. Every other color is fixed — the design
+ * brief was specifically about a restrained, deliberate palette, not
+ * an infinitely reskinnable one.
+ */
+
+.wrapper {
+  --paper: #f7f6f2;
+  --ink: #14181f;
+  --graphite: #4b525a;
+  --hairline: #d9d5cb;
+  --accent: #2f4f3e; /* Field Green — overridden by theme.accent if provided */
+  --accent-secondary: #9c7a3c; /* Brass — overridden by theme.accentSecondary if provided */
+
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  padding: 56px 60px 48px;
+  color: var(--ink);
+}
+
+/* ---------- Watermark (optional, for paywall gating) ---------- */
+
+.watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.watermarkText {
+  font-family: var(--font-plex), sans-serif;
+  font-weight: 600;
+  font-size: 44px;
+  color: rgba(20, 24, 31, 0.08);
+  transform: rotate(-28deg);
+  white-space: nowrap;
+}
+
+/* ---------- Masthead ---------- */
+
+.masthead {
+  padding-bottom: 20px;
+  border-bottom: 1.5px solid var(--accent-secondary);
+  margin-bottom: 32px;
+}
+
+.name {
+  font-family: var(--font-fraunces), serif;
+  font-weight: 600;
+  font-size: 40px;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.roleLine {
+  font-family: var(--font-plex), sans-serif;
+  font-size: 15px;
+  color: var(--graphite);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.roleLine span:not(.dot) {
+  margin-right: 10px;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  display: inline-block;
+  margin-right: 10px;
+}
+
+/* ---------- Grid ---------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 0 40px;
+}
+
+.spine {
+  border-right: 1px solid var(--hairline);
+  padding-right: 28px;
+}
+
+/*
+ * Shared divider treatment — deliberately the SAME rule for both the
+ * spine and the main column, per the brief: one hairline style, used
+ * consistently everywhere, no separate variant per column.
+ */
+.section + .section {
+  border-top: 1px solid var(--hairline);
+  margin-top: 24px;
+  padding-top: 24px;
+}
+
+.label {
+  font-family: var(--font-fraunces), serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  margin: 0 0 10px;
+}
+
+.mainCol .label {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-plex), sans-serif;
+  font-size: 13px;
+  color: var(--graphite);
+  line-height: 1.6;
+}
+
+.list li {
+  margin-bottom: 5px;
+}
+
+.itemTitle {
+  color: var(--ink);
+  font-weight: 500;
+  display: block;
+}
+
+.itemDetail {
+  display: block;
+  font-size: 12px;
+}
+
+/* ---------- Main column ---------- */
+
+.summary {
+  font-family: var(--font-plex), sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0;
+}
+
+.expEntry {
+  margin-bottom: 24px;
+}
+
+.expEntry:last-child {
+  margin-bottom: 0;
+}
+
+.expHeader {
+  margin-bottom: 8px;
+}
+
+.expRole {
+  font-family: var(--font-plex), sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.expCompany {
+  font-family: var(--font-plex), sans-serif;
+  font-weight: 400;
+  color: var(--graphite);
+}
+
+.expDates {
+  display: block;
+  font-family: var(--font-fraunces), serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--graphite);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bulletList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bulletList li {
+  position: relative;
+  padding-left: 16px;
+  font-family: var(--font-plex), sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.bulletList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+}
+
+.docFooter {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-plex), sans-serif;
+  font-size: 11.5px;
+  color: var(--graphite);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 680px) {
+  .wrapper {
+    margin: 0;
+    border: none;
+    padding: 32px 24px;
+  }
+  .name {
+    font-size: 30px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .spine {
+    border-right: none;
+    border-bottom: 1px solid var(--hairline);
+    padding-right: 0;
+    padding-bottom: 24px;
+    margin-bottom: 28px;
+  }
+}
+
+/* ---------- Print ---------- */
+
+@media print {
+  .wrapper {
+    margin: 0;
+    border: none;
+    max-width: none;
+    padding: 0;
+    background: white;
+  }
+  .watermark {
+    display: none;
+  }
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

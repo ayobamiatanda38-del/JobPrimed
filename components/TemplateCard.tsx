@@ -130,7 +130,7 @@ export default function TemplateCard({
           </Link>
         ) : (
           <Link
-            href={`/editor?template=${encodeURIComponent(t.name)}`}
+            href={t.slug === "ledger-serif" ? "/editor/ledger-serif" : `/editor?template=${encodeURIComponent(t.name)}`}
             className="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold"
             style={{ background: t.accent, color: C.paper, fontFamily: F_DISPLAY, ...chamfer(6) }}
           >

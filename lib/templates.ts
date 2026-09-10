@@ -151,6 +151,20 @@ export const TEMPLATES: Template[] = [
     skills: ["Operations Management", "Vendor Negotiation", "Staff Training", "Budgeting"],
     education: "B.Sc. Hospitality Management — Lagos State University",
   },
+  {
+    slug: "ledger-serif",
+    name: "Ledger Serif",
+    profession: "Finance & Accounting",
+    tier: "Premium",
+    accent: "#2F4F3E",
+    layout: "two-col",
+    person: { name: "Ngozi Chukwu", role: "Senior Finance Manager" },
+    summary: "Finance leader with nine years turning fragmented reporting into decisions the board can act on the same day.",
+    highlights: ["Cut forecast variance from 14% to 4%", "Managed a ₦3.2B annual opex budget"],
+    skills: ["Financial Modeling", "IFRS Reporting", "Variance Analysis", "Board Reporting"],
+    education: "B.Sc. Accounting — University of Lagos",
+    extras: ["Editorial serif design", "Real print layout", "Fraunces & IBM Plex Sans"],
+  },
 ];
 
 export const PROFESSIONS = ["All", ...Array.from(new Set(TEMPLATES.map((t) => t.profession)))];
