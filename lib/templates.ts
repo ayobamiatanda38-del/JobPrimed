@@ -5,6 +5,13 @@ export type Template = {
   name: string;
   profession: string;
   tier: "Free" | "Premium";
+  /**
+   * Design-style category, independent of profession — mirrors the
+   * "Simple / Professional / Creative" filter pattern used by resume
+   * builders like Kickresume, so templates can be browsed by look-and-feel
+   * as well as by industry.
+   */
+  style: "Simple" | "Professional" | "Creative";
   accent: string;
   layout: "one-col" | "two-col";
   person: { name: string; role: string };
@@ -12,7 +19,6 @@ export type Template = {
   highlights: string[];
   skills: string[];
   education: string;
-  // Premium-only extra row — metrics, tech stack, bar admissions, etc.
   extras?: string[];
 };
 
@@ -22,6 +28,7 @@ export const TEMPLATES: Template[] = [
     name: "Ledger",
     profession: "Sales & Business Development",
     tier: "Free",
+    style: "Professional",
     accent: C.ink,
     layout: "two-col",
     person: { name: "Tunde Bakare", role: "Regional Sales Manager" },
@@ -35,6 +42,7 @@ export const TEMPLATES: Template[] = [
     name: "Ledger Executive",
     profession: "Sales & Business Development",
     tier: "Premium",
+    style: "Professional",
     accent: C.ink,
     layout: "two-col",
     person: { name: "Tunde Bakare", role: "Regional Sales Manager" },
@@ -49,7 +57,8 @@ export const TEMPLATES: Template[] = [
     name: "Signal",
     profession: "Marketing & Brand",
     tier: "Free",
-    accent: C.ignite,
+    style: "Simple",
+    accent: C.coral,
     layout: "one-col",
     person: { name: "Chiamaka Eze", role: "Brand Marketing Lead" },
     summary: "Builds campaigns that move category share, not just impressions.",
@@ -62,7 +71,8 @@ export const TEMPLATES: Template[] = [
     name: "Foundry",
     profession: "Software Engineering",
     tier: "Premium",
-    accent: C.charge,
+    style: "Creative",
+    accent: "#4361EE",
     layout: "two-col",
     person: { name: "David Okon", role: "Senior Backend Engineer" },
     summary: "Ships reliable distributed systems at scale, on call by choice.",
@@ -76,6 +86,7 @@ export const TEMPLATES: Template[] = [
     name: "Capital",
     profession: "Finance & Accounting",
     tier: "Free",
+    style: "Simple",
     accent: C.graphite,
     layout: "one-col",
     person: { name: "Ifeoma Nwosu", role: "Senior Financial Analyst" },
@@ -89,6 +100,7 @@ export const TEMPLATES: Template[] = [
     name: "Vital",
     profession: "Healthcare & Clinical",
     tier: "Free",
+    style: "Simple",
     accent: "#0E9F6E",
     layout: "one-col",
     person: { name: "Dr. Amaka Chukwu", role: "Clinical Operations Manager" },
@@ -102,6 +114,7 @@ export const TEMPLATES: Template[] = [
     name: "Aperture",
     profession: "Creative & Design",
     tier: "Premium",
+    style: "Creative",
     accent: C.gold,
     layout: "one-col",
     person: { name: "Zainab Bello", role: "Senior Product Designer" },
@@ -116,6 +129,7 @@ export const TEMPLATES: Template[] = [
     name: "Statute",
     profession: "Legal & Compliance",
     tier: "Premium",
+    style: "Professional",
     accent: "#3B2F63",
     layout: "two-col",
     person: { name: "Emeka Umeh", role: "Corporate Counsel" },
@@ -130,6 +144,7 @@ export const TEMPLATES: Template[] = [
     name: "Lecture",
     profession: "Education & Academia",
     tier: "Free",
+    style: "Simple",
     accent: "#B45309",
     layout: "one-col",
     person: { name: "Grace Adeyemi", role: "Curriculum Development Lead" },
@@ -143,6 +158,7 @@ export const TEMPLATES: Template[] = [
     name: "Baseline",
     profession: "Hospitality & Operations",
     tier: "Free",
+    style: "Simple",
     accent: "#0F766E",
     layout: "one-col",
     person: { name: "Musa Abdullahi", role: "Operations Manager" },
@@ -154,20 +170,22 @@ export const TEMPLATES: Template[] = [
   {
     slug: "ledger-serif",
     name: "Ledger Serif",
-    profession: "Finance & Accounting",
+    profession: "Universal — Editorial",
     tier: "Premium",
+    style: "Professional",
     accent: "#2F4F3E",
     layout: "two-col",
     person: { name: "Ngozi Chukwu", role: "Senior Finance Manager" },
-    summary: "Finance leader with nine years turning fragmented reporting into decisions the board can act on the same day.",
-    highlights: ["Cut forecast variance from 14% to 4%", "Managed a ₦3.2B annual opex budget"],
-    skills: ["Financial Modeling", "IFRS Reporting", "Variance Analysis", "Board Reporting"],
+    summary: "A dedicated serif layout with real print-ready typography — JobPrimed's flagship template.",
+    highlights: ["Editorial Fraunces + IBM Plex Sans typography", "Print-first, ATS-safe layout"],
+    skills: ["Financial Modeling", "IFRS Reporting", "Board Reporting"],
     education: "B.Sc. Accounting — University of Lagos",
-    extras: ["Editorial serif design", "Real print layout", "Fraunces & IBM Plex Sans"],
+    extras: ["Real print CSS", "Data-driven component"],
   },
 ];
 
 export const PROFESSIONS = ["All", ...Array.from(new Set(TEMPLATES.map((t) => t.profession)))];
+export const STYLES = ["All", "Free", "Simple", "Professional", "Creative"] as const;
 
 export function findTemplate(name: string): Template {
   return TEMPLATES.find((t) => t.name === name) ?? TEMPLATES[0];

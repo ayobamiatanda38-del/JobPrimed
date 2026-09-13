@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Zap, Menu, X, User, LogOut } from "lucide-react";
-import { C, F_DISPLAY, F_BODY } from "@/lib/theme";
+import { Sparkles, Menu, X, User, LogOut } from "lucide-react";
+import { C, F_DISPLAY, F_BODY, rounded } from "@/lib/theme";
 import { PrimaryButton } from "./ui";
 
 const NAV_PAGES = [
@@ -16,7 +16,7 @@ const NAV_PAGES = [
   { href: "/about", label: "About" },
 ];
 
-type SessionUser = { id: number; email: string; name: string | null };
+type SessionUser = { id: number; email: string; name: string | null; plan: "free" | "premium" };
 
 export default function Nav() {
   const pathname = usePathname();
@@ -40,15 +40,17 @@ export default function Nav() {
 
   return (
     <header
-      className="sticky top-0 z-50 border-b"
-      style={{ background: "rgba(255,255,255,0.94)", backdropFilter: "blur(8px)", borderColor: C.steelLine }}
+      className="sticky top-0 z-50"
+      style={{ background: "rgba(255,255,255,0.9)", backdropFilter: "blur(10px)", borderBottom: `1px solid ${C.surfaceLine}` }}
     >
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-6 h-18 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <Zap size={20} color={C.ignite} />
-          <span style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.ink, fontSize: 18 }}>JobPrimed</span>
+          <div className="w-8 h-8 flex items-center justify-center" style={{ background: C.primary, ...rounded(10) }}>
+            <Sparkles size={16} color={C.paper} />
+          </div>
+          <span style={{ fontFamily: F_DISPLAY, fontWeight: 800, color: C.ink, fontSize: 19 }}>JobPrimed</span>
         </Link>
-        <nav className="hidden lg:flex items-center gap-6">
+        <nav className="hidden lg:flex items-center gap-7">
           {NAV_PAGES.map((p) => (
             <Link
               key={p.href}
@@ -56,8 +58,8 @@ export default function Nav() {
               style={{
                 fontFamily: F_BODY,
                 color: pathname === p.href ? C.ink : C.graphite,
-                fontWeight: pathname === p.href ? 700 : 400,
-                fontSize: 14,
+                fontWeight: pathname === p.href ? 700 : 500,
+                fontSize: 14.5,
               }}
             >
               {p.label}
@@ -67,20 +69,20 @@ export default function Nav() {
         <div className="hidden lg:flex items-center gap-4">
           {user === undefined ? null : user ? (
             <>
-              <span className="flex items-center gap-2" style={{ fontFamily: F_BODY, color: C.ink, fontSize: 14 }}>
-                <User size={16} /> {user.name || user.email}
+              <span className="flex items-center gap-1.5" style={{ fontFamily: F_BODY, color: C.ink, fontSize: 14 }}>
+                <User size={15} /> {user.name || user.email}
               </span>
               <button onClick={logout} className="flex items-center gap-1" style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 14 }}>
-                <LogOut size={14} /> Log out
+                <LogOut size={13} /> Log out
               </button>
             </>
           ) : (
             <>
-              <Link href="/login" style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 14 }}>
+              <Link href="/login" style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 14.5, fontWeight: 500 }}>
                 Log in
               </Link>
-              <PrimaryButton href="/signup" style={{ padding: "10px 20px", fontSize: 14 }}>
-                Sign up
+              <PrimaryButton href="/signup" style={{ padding: "10px 22px", fontSize: 14 }}>
+                Sign up free
               </PrimaryButton>
             </>
           )}
@@ -90,26 +92,15 @@ export default function Nav() {
         </button>
       </div>
       {open && (
-        <div className="lg:hidden border-t px-6 py-4 flex flex-col gap-4" style={{ borderColor: C.steelLine, background: C.paper }}>
+        <div className="lg:hidden px-6 py-4 flex flex-col gap-4" style={{ borderTop: `1px solid ${C.surfaceLine}`, background: C.paper }}>
           {NAV_PAGES.map((p) => (
-            <Link
-              key={p.href}
-              href={p.href}
-              onClick={() => setOpen(false)}
-              style={{ fontFamily: F_BODY, color: pathname === p.href ? C.ink : C.graphite, fontSize: 15, fontWeight: pathname === p.href ? 700 : 400 }}
-            >
+            <Link key={p.href} href={p.href} onClick={() => setOpen(false)} style={{ fontFamily: F_BODY, color: pathname === p.href ? C.ink : C.graphite, fontSize: 15, fontWeight: pathname === p.href ? 700 : 500 }}>
               {p.label}
             </Link>
           ))}
           <div className="flex gap-3 pt-2">
             {user ? (
-              <button
-                onClick={() => {
-                  logout();
-                  setOpen(false);
-                }}
-                style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 14 }}
-              >
+              <button onClick={() => { logout(); setOpen(false); }} style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 14 }}>
                 Log out
               </button>
             ) : (
@@ -117,9 +108,7 @@ export default function Nav() {
                 <Link href="/login" onClick={() => setOpen(false)} style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 14 }}>
                   Log in
                 </Link>
-                <Link href="/signup" onClick={() => setOpen(false)} style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.ignite, fontSize: 14 }}>
-                  Sign up
-                </Link>
+                <PrimaryButton href="/signup">Sign up free</PrimaryButton>
               </>
             )}
           </div>
