@@ -66,14 +66,19 @@ export function SecondaryButton({
   onClick,
   className = "",
   href,
+  dark = false,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
   href?: string;
+  /** Legacy prop from the old dark-background "ignition" pages — flips to a white outline on dark surfaces. */
+  dark?: boolean;
 }) {
   const cls = `inline-flex items-center gap-2 px-7 py-3.5 font-semibold border-2 transition-colors duration-150 ${className}`;
-  const style: React.CSSProperties = { borderColor: C.ink, color: C.ink, fontFamily: F_DISPLAY, background: C.paper, ...rounded(999) };
+  const style: React.CSSProperties = dark
+    ? { borderColor: C.paper, color: C.paper, fontFamily: F_DISPLAY, background: "transparent", ...rounded(999) }
+    : { borderColor: C.ink, color: C.ink, fontFamily: F_DISPLAY, background: C.paper, ...rounded(999) };
   if (href) {
     return (
       <a href={href} className={cls} style={style}>

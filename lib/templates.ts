@@ -58,11 +58,7 @@ export const TEMPLATES: Template[] = [
     profession: "Marketing & Brand",
     tier: "Free",
     style: "Simple",
-<<<<<<< HEAD
     accent: C.coral,
-=======
-    accent: C.ignite,
->>>>>>> 88a392b81a221640626c3805d3ec4818df05a21b
     layout: "one-col",
     person: { name: "Chiamaka Eze", role: "Brand Marketing Lead" },
     summary: "Builds campaigns that move category share, not just impressions.",
@@ -76,11 +72,7 @@ export const TEMPLATES: Template[] = [
     profession: "Software Engineering",
     tier: "Premium",
     style: "Creative",
-<<<<<<< HEAD
     accent: "#4361EE",
-=======
-    accent: C.charge,
->>>>>>> 88a392b81a221640626c3805d3ec4818df05a21b
     layout: "two-col",
     person: { name: "David Okon", role: "Senior Backend Engineer" },
     summary: "Ships reliable distributed systems at scale, on call by choice.",
