@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { C, F_DISPLAY, F_BODY, F_MONO, chamfer } from "@/lib/theme";
-import { PrimaryButton, PageHeader } from "@/components/ui";
+import { C, F_BODY, rounded } from "@/lib/theme";
+import { PrimaryButton, PageHeader, Card } from "@/components/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,39 +33,41 @@ export default function LoginPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="Account" title="Log in." sub="Real authentication — your password is hashed and never stored in plain text." />
+      <PageHeader eyebrow="Account" title="Log in." sub="Your password is hashed and never stored in plain text." />
       <div className="max-w-sm mx-auto px-6 pb-24">
-        <form onSubmit={submit} className="p-6 bg-white border" style={{ borderColor: C.steelLine, ...chamfer(18) }}>
-          {error && (
-            <div className="p-3 mb-4" style={{ background: C.igniteTint, ...chamfer(8) }}>
-              <p style={{ fontFamily: F_BODY, fontSize: 13, color: C.igniteDark }}>{error}</p>
-            </div>
-          )}
-          <label style={{ fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }}>EMAIL</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full mt-1 mb-4 px-3 py-2.5 border text-sm"
-            style={{ borderColor: C.steelLine, fontFamily: F_BODY, ...chamfer(8) }}
-          />
-          <label style={{ fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }}>PASSWORD</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mt-1 mb-6 px-3 py-2.5 border text-sm"
-            style={{ borderColor: C.steelLine, fontFamily: F_BODY, ...chamfer(8) }}
-          />
-          <PrimaryButton type="submit" className="w-full justify-center">
-            {loading ? "Logging in…" : "Log in"}
-          </PrimaryButton>
-        </form>
-        <p className="mt-4 text-center" style={{ fontFamily: F_BODY, fontSize: 13, color: C.graphite }}>
+        <Card className="p-7">
+          <form onSubmit={submit}>
+            {error && (
+              <div className="p-3 mb-4" style={{ background: C.coralTint, ...rounded(10) }}>
+                <p style={{ fontFamily: F_BODY, fontSize: 13, color: C.coral }}>{error}</p>
+              </div>
+            )}
+            <label style={{ fontFamily: F_BODY, fontSize: 12, fontWeight: 600, color: C.graphiteLight }}>Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full mt-1 mb-4 px-4 py-2.5 border text-sm"
+              style={{ borderColor: C.surfaceLine, fontFamily: F_BODY, ...rounded(10) }}
+            />
+            <label style={{ fontFamily: F_BODY, fontSize: 12, fontWeight: 600, color: C.graphiteLight }}>Password</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full mt-1 mb-6 px-4 py-2.5 border text-sm"
+              style={{ borderColor: C.surfaceLine, fontFamily: F_BODY, ...rounded(10) }}
+            />
+            <PrimaryButton type="submit" className="w-full justify-center">
+              {loading ? "Logging in…" : "Log in"}
+            </PrimaryButton>
+          </form>
+        </Card>
+        <p className="mt-4 text-center" style={{ fontFamily: F_BODY, fontSize: 13.5, color: C.graphite }}>
           No account yet?{" "}
-          <Link href="/signup" style={{ color: C.ignite, fontWeight: 600 }}>
+          <Link href="/signup" style={{ color: C.primary, fontWeight: 600 }}>
             Sign up
           </Link>
         </p>

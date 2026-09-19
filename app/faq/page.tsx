@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { C, F_DISPLAY, F_BODY } from "@/lib/theme";
+import { C, F_DISPLAY, F_BODY, rounded } from "@/lib/theme";
 import { PageHeader } from "@/components/ui";
 
 const FAQS = [
@@ -22,12 +22,20 @@ export default function FAQPage() {
         {FAQS.map((item, i) => {
           const isOpen = open === i;
           return (
-            <div key={item.q} style={{ borderBottom: `1px solid ${C.steelLine}` }}>
-              <button onClick={() => setOpen(isOpen ? -1 : i)} className="w-full flex items-center justify-between py-5 text-left gap-4">
-                <span style={{ fontFamily: F_DISPLAY, fontWeight: 600, color: C.ink, fontSize: 16 }}>{item.q}</span>
+            <div
+              key={item.q}
+              className="mb-3 overflow-hidden"
+              style={{ background: C.paper, border: `1px solid ${C.surfaceLine}`, ...rounded(16) }}
+            >
+              <button onClick={() => setOpen(isOpen ? -1 : i)} className="w-full flex items-center justify-between px-5 py-4 text-left gap-4">
+                <span style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.ink, fontSize: 15.5 }}>{item.q}</span>
                 <ChevronDown size={18} color={C.graphite} style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 150ms", flexShrink: 0 }} />
               </button>
-              {isOpen && <p className="pb-5 pr-8" style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 14 }}>{item.a}</p>}
+              {isOpen && (
+                <p className="px-5 pb-5" style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 14, lineHeight: 1.6 }}>
+                  {item.a}
+                </p>
+              )}
             </div>
           );
         })}

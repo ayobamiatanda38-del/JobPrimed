@@ -1,17 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
 import { Clock, CheckCircle2 } from "lucide-react";
-import { C, F_DISPLAY, F_BODY, F_MONO, chamfer } from "@/lib/theme";
-import { PageHeader, PrimaryButton } from "@/components/ui";
+import { C, F_DISPLAY, F_BODY, rounded } from "@/lib/theme";
+import { PageHeader, PrimaryButton, Card } from "@/components/ui";
 
 function StatusStep({ label, active, done }: { label: string; active?: boolean; done?: boolean }) {
   return (
     <div className="flex-1 flex flex-col items-center text-center">
-      <div className="w-9 h-9 flex items-center justify-center mb-2" style={{ background: done ? C.ignite : active ? C.ink : C.steel, color: done || active ? C.paper : C.graphiteLight, ...chamfer(6) }}>
+      <div className="w-9 h-9 flex items-center justify-center mb-2" style={{ background: done ? C.primary : active ? C.ink : C.surface, color: done || active ? C.paper : C.graphiteLight, ...rounded(999) }}>
         {done ? <CheckCircle2 size={16} /> : <Clock size={16} />}
       </div>
-      <span style={{ fontFamily: F_MONO, fontSize: 11, color: active ? C.ink : C.graphiteLight, fontWeight: active ? 700 : 500 }}>{label}</span>
+      <span style={{ fontFamily: F_BODY, fontSize: 11, color: active ? C.ink : C.graphiteLight, fontWeight: active ? 700 : 500 }}>{label}</span>
     </div>
   );
 }
@@ -27,22 +26,22 @@ export default function ExpertReviewPage() {
     <div>
       <PageHeader eyebrow="Paid add-on" title="A hiring manager's eye, before they see it." sub="Certified reviewers critique your AI draft line by line and hand back a revised version." />
       <div className="max-w-6xl mx-auto px-6 pb-16 grid md:grid-cols-2 gap-10">
-        <div className="p-6 bg-white border" style={{ borderColor: C.steelLine, ...chamfer(18) }}>
+        <Card className="p-7">
           <h3 className="mb-4" style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.ink, fontSize: 18 }}>Order a review</h3>
-          <div style={{ fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }} className="mb-2">TURNAROUND</div>
+          <div style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphiteLight, fontWeight: 600 }} className="mb-2">TURNAROUND</div>
           <div className="flex gap-2 mb-5">
             {["72hr", "24hr rush"].map((t) => (
-              <button key={t} onClick={() => setTurnaround(t)} className="flex-1 py-2 text-sm font-semibold"
-                style={{ fontFamily: F_DISPLAY, background: turnaround === t ? C.ink : C.steel, color: turnaround === t ? C.paper : C.graphite, ...chamfer(8) }}>
+              <button key={t} onClick={() => setTurnaround(t)} className="flex-1 py-2.5 text-sm font-semibold"
+                style={{ fontFamily: F_DISPLAY, background: turnaround === t ? C.ink : C.surface, color: turnaround === t ? C.paper : C.graphite, ...rounded(999) }}>
                 {t}
               </button>
             ))}
           </div>
-          <div style={{ fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }} className="mb-2">REVIEWER LEVEL</div>
+          <div style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphiteLight, fontWeight: 600 }} className="mb-2">REVIEWER LEVEL</div>
           <div className="flex gap-2 mb-6">
             {["Standard", "Senior"].map((l) => (
-              <button key={l} onClick={() => setLevel(l)} className="flex-1 py-2 text-sm font-semibold"
-                style={{ fontFamily: F_DISPLAY, background: level === l ? C.ink : C.steel, color: level === l ? C.paper : C.graphite, ...chamfer(8) }}>
+              <button key={l} onClick={() => setLevel(l)} className="flex-1 py-2.5 text-sm font-semibold"
+                style={{ fontFamily: F_DISPLAY, background: level === l ? C.ink : C.surface, color: level === l ? C.paper : C.graphite, ...rounded(999) }}>
                 {l}
               </button>
             ))}
@@ -51,25 +50,25 @@ export default function ExpertReviewPage() {
             <input type="checkbox" checked={addCall} onChange={(e) => setAddCall(e.target.checked)} /> Add a 1-on-1 feedback call
           </label>
           <PrimaryButton href={checkoutHref} className="w-full justify-center">Continue to payment</PrimaryButton>
-          <p className="mt-3 text-center" style={{ fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }}>Leads to checkout — no real payment is processed yet.</p>
-        </div>
-        <div className="p-6 bg-white border" style={{ borderColor: C.steelLine, ...chamfer(18) }}>
+          <p className="mt-3 text-center" style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphiteLight }}>Leads to checkout — no real payment is processed yet.</p>
+        </Card>
+        <Card className="p-7">
           <h3 className="mb-6" style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.ink, fontSize: 18 }}>Status tracker</h3>
           <div className="flex items-center mb-10">
             <StatusStep label="Submitted" done />
-            <div style={{ flex: 1, height: 2, background: C.ignite }} />
+            <div style={{ flex: 1, height: 2, background: C.primary }} />
             <StatusStep label="In review" active />
-            <div style={{ flex: 1, height: 2, background: C.steelLine }} />
+            <div style={{ flex: 1, height: 2, background: C.surfaceLine }} />
             <StatusStep label="Delivered" />
           </div>
-          <div className="p-4" style={{ background: C.steel, ...chamfer(10) }}>
-            <div style={{ fontFamily: F_MONO, fontSize: 11, color: C.graphiteLight }} className="mb-1">CURRENT STATUS</div>
+          <div className="p-4" style={{ background: C.surface, ...rounded(14) }}>
+            <div style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphiteLight, fontWeight: 600 }} className="mb-1">CURRENT STATUS</div>
             <p style={{ fontFamily: F_BODY, fontSize: 14, color: C.ink }}>Your {level.toLowerCase()} reviewer picked this up 6 hours ago — expected delivery within {turnaround}.</p>
           </div>
           <p className="mt-6" style={{ fontFamily: F_BODY, fontSize: 13, color: C.graphite }}>
-            When feedback is delivered, you'll get inline comments directly on your CV plus a short written summary — and one round of revisions is included.
+            When feedback is delivered, you'll get inline comments directly on your CV plus a short written summary.
           </p>
-        </div>
+        </Card>
       </div>
     </div>
   );
