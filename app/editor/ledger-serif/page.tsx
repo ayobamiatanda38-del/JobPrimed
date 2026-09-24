@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Lock, Plus, Printer, Trash2 } from "lucide-react";
-import { C, F_DISPLAY, F_BODY, rounded } from "@/lib/theme";
+import { Lock, Plus, Printer, Trash2, CheckCircle2, Circle, X, Download } from "lucide-react";
+import { C, F_DISPLAY, F_BODY, rounded, softShadow } from "@/lib/theme";
 import { PageHeader, PrimaryButton, Card } from "@/components/ui";
 import { CVTemplate, sampleCVData } from "@/components/templates/ledger-serif";
 import type { CVEducationEntry, CVCertificationEntry } from "@/components/templates/ledger-serif";
@@ -17,6 +17,51 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label style={{ fontFamily: F_BODY, fontSize: 11, fontWeight: 600, color: C.graphiteLight }}>{children}</label>;
 }
 
+type ReviewCheck = { label: string; done: boolean };
+
+/**
+ * Standard "review before you download" step — the kind of checkpoint
+ * Kickresume/Zety-style builders show before generating a PDF, so the
+ * flow doesn't just dump straight into the browser's own print dialog.
+ */
+function ReviewDownloadModal({ checks, onClose, onConfirm }: { checks: ReviewCheck[]; onClose: () => void; onConfirm: () => void }) {
+  const incomplete = checks.filter((c) => !c.done);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(20,20,43,0.55)" }}>
+      <div className="w-full max-w-sm p-6 relative" style={{ background: C.paper, ...rounded(20), boxShadow: "0 24px 60px rgba(20,20,43,0.35)" }}>
+        <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4" style={{ color: C.graphiteLight }}>
+          <X size={18} />
+        </button>
+        <div className="w-11 h-11 flex items-center justify-center mb-3" style={{ background: C.primaryTint, ...rounded(12) }}>
+          <Download size={19} color={C.primary} />
+        </div>
+        <h3 style={{ fontFamily: F_DISPLAY, fontWeight: 800, color: C.ink, fontSize: 18 }} className="mb-1">Review before you download</h3>
+        <p style={{ fontFamily: F_BODY, color: C.graphite, fontSize: 13 }} className="mb-4">
+          A quick check — this is exactly how it'll look in the exported PDF.
+        </p>
+        <div className="space-y-2 mb-5">
+          {checks.map((c) => (
+            <div key={c.label} className="flex items-center gap-2">
+              {c.done ? <CheckCircle2 size={16} color={C.success} /> : <Circle size={16} color={C.graphiteLight} />}
+              <span style={{ fontFamily: F_BODY, fontSize: 13, color: c.done ? C.ink : C.graphiteLight }}>{c.label}</span>
+            </div>
+          ))}
+        </div>
+        {incomplete.length > 0 && (
+          <div className="p-3 mb-4" style={{ background: C.coralTint, ...rounded(12) }}>
+            <p style={{ fontFamily: F_BODY, fontSize: 12, color: C.coral }}>
+              {incomplete.length} section{incomplete.length > 1 ? "s" : ""} still empty — you can still download, or go back and fill it in first.
+            </p>
+          </div>
+        )}
+        <PrimaryButton onClick={onConfirm} className="w-full justify-center" style={{ boxShadow: softShadow }}>
+          <Printer size={15} /> Looks good — download PDF
+        </PrimaryButton>
+      </div>
+    </div>
+  );
+}
+
 function RemoveButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button onClick={onClick} aria-label={label} className="flex items-center gap-1 text-xs" style={{ color: C.coral, fontFamily: F_DISPLAY, fontWeight: 700 }}>
@@ -27,6 +72,7 @@ function RemoveButton({ onClick, label }: { onClick: () => void; label: string }
 
 export default function LedgerSerifEditorPage() {
   const [user, setUser] = useState<SessionUser | null | undefined>(undefined);
+  const [showReview, setShowReview] = useState(false);
   const [name, setName] = useState(sampleCVData.name);
   const [title, setTitle] = useState(sampleCVData.title);
   const [location, setLocation] = useState(sampleCVData.location ?? "");
@@ -62,6 +108,14 @@ export default function LedgerSerifEditorPage() {
     experience: experience.map((e) => ({ role: e.role, company: e.company, startDate: e.startDate, endDate: e.endDate, bullets: e.bulletsText.split("\n").map((b) => b.trim()).filter(Boolean) })),
     lastUpdated: sampleCVData.lastUpdated,
   };
+
+  const reviewChecks: ReviewCheck[] = [
+    { label: "Name & title filled in", done: Boolean(name.trim() && title.trim()) },
+    { label: "Contact details added", done: Boolean(email.trim() || phone.trim()) },
+    { label: "Summary written", done: Boolean(summary.trim().length > 20) },
+    { label: "At least one work experience", done: experience.some((e) => e.role.trim() && e.company.trim()) },
+    { label: "Skills listed", done: skillsText.trim().length > 0 },
+  ];
 
   if (user === undefined) return null;
 
@@ -179,7 +233,7 @@ export default function LedgerSerifEditorPage() {
         <div className="sticky top-20">
           <div className="flex items-center justify-between mb-3">
             <span style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphiteLight, fontWeight: 600 }}>LIVE PREVIEW</span>
-            <PrimaryButton onClick={() => window.print()} style={{ padding: "8px 18px", fontSize: 13 }}>
+            <PrimaryButton onClick={() => setShowReview(true)} style={{ padding: "8px 18px", fontSize: 13 }}>
               <Printer size={14} /> Save as PDF
             </PrimaryButton>
           </div>
@@ -187,10 +241,21 @@ export default function LedgerSerifEditorPage() {
             <CVTemplate data={livePreviewData} />
           </div>
           <p className="mt-3" style={{ fontFamily: F_BODY, fontSize: 10.5, color: C.graphiteLight }}>
-            "Save as PDF" opens your browser's print dialog — choose "Save as PDF" as the destination.
+            We'll show a quick review step, then open your browser's print dialog — choose "Save as PDF" as the destination.
           </p>
         </div>
       </div>
+
+      {showReview && (
+        <ReviewDownloadModal
+          checks={reviewChecks}
+          onClose={() => setShowReview(false)}
+          onConfirm={() => {
+            setShowReview(false);
+            window.print();
+          }}
+        />
+      )}
     </div>
   );
 }

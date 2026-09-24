@@ -14,45 +14,81 @@ const TRUST_STATS = [
 
 function ResumeMockup() {
   return (
-    <Card className="p-6 sm:p-8 relative">
-      <div className="flex items-center gap-4 mb-5">
-        <div
-          className="w-16 h-16 flex items-center justify-center shrink-0"
-          style={{ background: `linear-gradient(135deg, ${C.primary}, ${C.coral})`, ...rounded(999) }}
-        >
-          <span style={{ fontFamily: F_DISPLAY, fontWeight: 800, color: C.paper, fontSize: 20 }}>AO</span>
-        </div>
-        <div>
-          <div style={{ fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 20, color: C.ink }}>Adaeze Okafor</div>
-          <div style={{ fontFamily: F_BODY, fontSize: 13.5, color: C.primaryDark, fontWeight: 600 }}>Senior Trade Marketing Manager</div>
-        </div>
-      </div>
-      <div className="space-y-2 mb-5">
-        {[92, 78, 85, 60].map((w, i) => (
-          <div key={i} style={{ height: 8, width: `${w}%`, background: C.surface, ...rounded(999) }} />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2 mb-5">
-        {["Campaign Strategy", "Brand Positioning", "Analytics"].map((s) => (
-          <span key={s} className="px-3 py-1 text-xs font-semibold" style={{ background: C.primaryTint, color: C.primaryDark, fontFamily: F_BODY, ...rounded(999) }}>
-            {s}
-          </span>
-        ))}
-      </div>
+    <div className="relative">
+      {/* soft color blobs behind the card for depth, instead of a flat white panel */}
       <div
-        className="absolute -top-3 -right-3 px-3 py-1.5 text-xs font-bold flex items-center gap-1"
-        style={{ background: C.success, color: C.paper, ...rounded(999), boxShadow: softShadow }}
+        className="absolute -inset-6 -z-10 hidden sm:block"
+        style={{ background: `radial-gradient(60% 60% at 20% 10%, ${C.primaryTint} 0%, transparent 70%), radial-gradient(50% 50% at 90% 90%, ${C.coralTint} 0%, transparent 70%)` }}
+      />
+      <Card className="p-0 relative overflow-hidden" style={{ maxWidth: 400, marginInline: "auto" }}>
+        <div className="flex" style={{ minHeight: 360 }}>
+          {/* colored sidebar, mirrors the real CVTemplate component */}
+          <div className="w-[34%] px-4 py-6 flex flex-col items-center" style={{ background: `linear-gradient(160deg, ${C.primary}, ${C.primaryDark})` }}>
+            <div
+              className="w-12 h-12 flex items-center justify-center mb-3"
+              style={{ background: "rgba(255,255,255,0.22)", ...rounded(999) }}
+            >
+              <span style={{ fontFamily: F_DISPLAY, fontWeight: 800, color: C.paper, fontSize: 15 }}>AO</span>
+            </div>
+            <div className="text-center mb-4" style={{ fontFamily: F_DISPLAY, fontWeight: 700, color: C.paper, fontSize: 12.5, lineHeight: 1.3 }}>
+              Adaeze Okafor
+            </div>
+            <div className="w-full mb-4">
+              <div style={{ fontFamily: F_DISPLAY, fontSize: 8, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.65)" }} className="mb-1.5 uppercase">Skills</div>
+              {["Campaign Strategy", "Brand Positioning", "Analytics"].map((s) => (
+                <div key={s} className="mb-1 px-2 py-1" style={{ background: "rgba(255,255,255,0.16)", ...rounded(999), fontFamily: F_BODY, fontSize: 7.5, color: C.paper }}>
+                  {s}
+                </div>
+              ))}
+            </div>
+            <div className="w-full">
+              <div style={{ fontFamily: F_DISPLAY, fontSize: 8, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.65)" }} className="mb-1.5 uppercase">Education</div>
+              <div style={{ fontFamily: F_BODY, fontSize: 8, color: "rgba(255,255,255,0.9)", lineHeight: 1.5 }}>B.Sc. Marketing<br />University of Ibadan</div>
+            </div>
+          </div>
+          {/* main column with real-looking copy, not gray placeholder bars */}
+          <div className="flex-1 px-5 py-6">
+            <div style={{ fontFamily: F_DISPLAY, fontWeight: 800, fontSize: 15, color: C.ink }}>Adaeze Okafor</div>
+            <div style={{ fontFamily: F_BODY, fontSize: 10.5, color: C.primaryDark, fontWeight: 600 }} className="mb-3">Senior Trade Marketing Manager</div>
+            <div style={{ fontFamily: F_DISPLAY, fontWeight: 700, fontSize: 9, color: C.ink }} className="mb-1.5 pb-1 border-b" >Summary</div>
+            <p style={{ fontFamily: F_BODY, fontSize: 8, lineHeight: 1.6, color: C.graphite }} className="mb-4">
+              Trade marketing lead with 8 years driving retail activation across 400+ outlets, lifting category share 6pts in FY25.
+            </p>
+            <div style={{ fontFamily: F_DISPLAY, fontWeight: 700, fontSize: 9, color: C.ink }} className="mb-1.5 pb-1 border-b">Experience</div>
+            <div className="mb-1" style={{ fontFamily: F_DISPLAY, fontWeight: 700, fontSize: 8.5, color: C.ink }}>Trade Marketing Manager · Duncan &amp; Vale</div>
+            <ul className="mb-1" style={{ paddingLeft: 12, listStyle: "disc", color: C.graphite }}>
+              <li style={{ fontFamily: F_BODY, fontSize: 7.5, lineHeight: 1.6 }}>Launched 12 SKUs across West Africa, +18% volume YoY.</li>
+              <li style={{ fontFamily: F_BODY, fontSize: 7.5, lineHeight: 1.6 }}>Managed ₦210M annual trade spend across 6 regions.</li>
+            </ul>
+          </div>
+        </div>
+        <div
+          className="absolute top-3 right-3 px-2.5 py-1 text-[10px] font-bold flex items-center gap-1"
+          style={{ background: C.success, color: C.paper, ...rounded(999), boxShadow: softShadow }}
+        >
+          <CheckCircle2 size={11} /> ATS 96/100
+        </div>
+      </Card>
+      <div
+        className="absolute -bottom-4 -left-4 px-3 py-2 flex items-center gap-1.5 hidden sm:flex"
+        style={{ background: C.paper, ...rounded(14), boxShadow: softShadow, border: `1px solid ${C.surfaceLine}` }}
       >
-        <CheckCircle2 size={13} /> ATS 96/100
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star key={i} size={12} fill={C.gold} color={C.gold} />
+        ))}
+        <span style={{ fontFamily: F_BODY, fontSize: 11, color: C.graphite, fontWeight: 600 }} className="ml-1">4.8/5 from job seekers</span>
       </div>
-    </Card>
+    </div>
   );
 }
 
 export default function HomePage() {
   return (
     <div>
-      <section className="relative overflow-hidden" style={{ background: C.paper }}>
+      <section
+        className="relative overflow-hidden"
+        style={{ background: `radial-gradient(70% 60% at 85% 0%, ${C.primaryTint} 0%, transparent 60%), ${C.paper}` }}
+      >
         <div className="max-w-6xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28 grid md:grid-cols-2 gap-16 items-center">
           <div>
             <Eyebrow>AI-powered career prep</Eyebrow>
